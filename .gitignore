@@ -1,0 +1,43 @@
+# Środowisko
+.env
+.env.backup
+.env.production
+/auth.json
+
+# Vendor / dependencies
+/vendor
+/node_modules
+
+# Build / kompilaty
+/public/build
+/public/hot
+/public/storage
+
+# Laravel storage & cache
+/storage/*.key
+/storage/debugbar
+/storage/framework/*
+/storage/logs/*.log
+
+# Testy
+/.phpunit.cache
+.phpunit.result.cache
+
+# IDE / edytory
+/.idea
+/.vscode
+/.fleet
+/.zed
+/.nova
+
+# Homestead
+Homestead.json
+Homestead.yaml
+
+# NPM / Yarn błędy
+npm-debug.log*
+yarn-error.log*
+
+# System
+.DS_Store
+Thumbs.db
