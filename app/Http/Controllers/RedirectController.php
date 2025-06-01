@@ -11,11 +11,11 @@ class RedirectController extends Controller
     {
         $user = Auth::user();
 
-        switch ($user->user_type_id) {
-            case 1: return redirect('/admin');
-            case 2: return redirect('/client');
-            case 3: return redirect('/staff');
-            default: abort(403);
-        }
+        return match ($user->user_type_id) {
+            1 => redirect()->route('admin.dashboard'),
+            2 => redirect()->route('client.dashboard'),
+            3 => redirect()->route('staff.dashboard'),
+            default => abort(403),
+        };
     }
 }
