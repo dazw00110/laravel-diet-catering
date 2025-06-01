@@ -19,6 +19,9 @@ return new class extends Migration {
             $table->boolean('is_vegan')->default(false);
             $table->boolean('is_vegetarian')->default(false);
             $table->string('avatar_url', 255)->nullable();
+
+            $table->rememberToken();
+
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });

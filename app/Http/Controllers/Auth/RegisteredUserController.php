@@ -9,7 +9,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -23,28 +22,43 @@ class RegisteredUserController extends Controller
     }
 
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Handle an incoming registration request (pełna walidacja bez wege).
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'birth_date' => ['required', 'date', 'before_or_equal:today'],
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/^(?=.*[a-zA-Z])(?=.*\d).+$/',
+            ],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'],
+            'birth_date' => $validated['birth_date'],
+            'password' => Hash::make($validated['password']),
+            'user_type_id' => 2, // klient
+            'avatar_url' => null,
+            'is_vegan' => $request->boolean('is_vegan'),
+            'is_vegetarian' => $request->boolean('is_vegetarian'),
         ]);
 
         event(new Registered($user));
-
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        switch ($user->user_type_id) {
+            case 1: return redirect('/admin');
+            case 2: return redirect('/client');
+            case 3: return redirect('/staff');
+            default: abort(403, 'Nieznana rola użytkownika.');
+        }
     }
 }
