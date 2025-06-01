@@ -1,30 +1,61 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FitBox Catering – logowanie</title>
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+        .overlay {
+            background-color: rgba(255, 248, 240, 0.95);
+            backdrop-filter: blur(5px);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center px-4 py-8 text-gray-900">
+
+    <!-- Nazwa cateringu -->
+    <div class="mb-6 text-center header-overlay text-white">
+        <h1 class="text-4xl font-extrabold drop-shadow-md">
+            FitBox Catering
+        </h1>
+        <p class="mt-1 text-sm tracking-wide">
+            Twoja codzienna dawka zdrowia 🍰
+        </p>
+    </div>
+
+    <!-- Formularz logowania/rejestracji -->
+    <div class="w-full max-w-xl overlay">
+        {{ $slot }}
+
+        <!-- Przycisk resetowania hasła -->
+        @if (Route::has('password.request'))
+            <div class="text-center mt-6">
+                <a href="{{ route('password.request') }}"
+                   class="text-sm font-semibold text-green-700 hover:underline">
+                    Resetuj hasło
                 </a>
             </div>
+        @endif
+    </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
-            </div>
-        </div>
-    </body>
+</body>
 </html>

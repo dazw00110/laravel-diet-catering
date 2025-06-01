@@ -1,39 +1,55 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\RoleMiddleware;
 
+// Strona główna
 Route::get('/', function () {
     return view('welcome');
+})->name('home');
+
+// Rejestracja i logowanie
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store']);
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 });
 
-Route::get('/dashboard', RedirectController::class)
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Wylogowanie
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
 
-Route::middleware(['auth', 'role:2'])->group(function () {
-    Route::get('/client', function () {
-        return view('client.dashboard');
-    })->name('client.dashboard');
+// Przekierowanie po zalogowaniu wg roli
+Route::get('/redirect', RedirectController::class)
+    ->middleware('auth')
+    ->name('redirect');
+
+// Admin
+Route::middleware(['auth', RoleMiddleware::class.':1'])->group(function () {
+    Route::get('/admin', fn() => view('admin.dashboard'))->name('admin.dashboard');
 });
 
-Route::middleware(['auth', 'role:3'])->group(function () {
-    Route::get('/staff', function () {
-        return view('staff.dashboard');
-    })->name('staff.dashboard');
+// Client
+Route::middleware(['auth', RoleMiddleware::class.':2'])->group(function () {
+    Route::get('/client', fn() => view('client.dashboard'))->name('client.dashboard');
 });
 
-Route::middleware(['auth', 'role:1'])->group(function () {
-    Route::get('/admin', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+// Staff
+Route::middleware(['auth', RoleMiddleware::class.':3'])->group(function () {
+    Route::get('/staff', fn() => view('staff.dashboard'))->name('staff.dashboard');
 });
 
+// Profil użytkownika
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::get('/dashboard', fn() => redirect()->route('redirect'))->name('dashboard');
