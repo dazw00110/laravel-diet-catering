@@ -12,13 +12,13 @@ class RedirectController extends Controller
 
         switch ($user->user_type_id) {
             case 1:
-                return redirect()->route('admin.dashboard'); // Admin
+                return redirect()->route('admin.dashboard');
             case 2:
-                return redirect()->route('client.dashboard'); // Klient
+                return redirect()->route('client.dashboard');
             case 3:
-                return redirect()->route('staff.dashboard'); // Pracownik
+                return redirect()->route('staff.dashboard');
             default:
-                return redirect()->route('home'); // Domyślnie
+                abort(403, 'Nieznana rola użytkownika.');
         }
     }
 }
