@@ -65,3 +65,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// TESTOWE WIDOKI BŁĘDÓW (tylko w trybie local)
+if (app()->environment('local')) {
+    Route::get('/test401', fn() => abort(401));
+    Route::get('/test403', fn() => abort(403));
+    Route::get('/test404', fn() => abort(404));
+    Route::get('/test419', fn() => abort(419));
+    Route::get('/test422', fn() => abort(422));
+    Route::get('/test500', fn() => abort(500));
+}
+
