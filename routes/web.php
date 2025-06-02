@@ -7,10 +7,12 @@ use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\RoleMiddleware;
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
+use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+
 // Strona główna
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', fn () => view('welcome'))->name('home');
 
 // Rejestracja i logowanie
 Route::middleware('guest')->group(function () {
@@ -25,31 +27,41 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-// Przekierowanie po zalogowaniu wg roli
+// Przekierowanie po zalogowaniu
 Route::get('/redirect', RedirectController::class)
     ->middleware('auth')
     ->name('redirect');
 
-// Admin
-Route::middleware(['auth', RoleMiddleware::class.':1'])->group(function () {
-    Route::get('/admin', fn() => view('admin.dashboard'))->name('admin.dashboard');
+// Dashboard ogólny 
+Route::get('/dashboard', fn () => redirect()->route('redirect'))->name('dashboard');
+
+// PANEL ADMINISTRATORA
+Route::prefix('admin')->middleware(['auth', RoleMiddleware::class . ':1'])->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/users', fn () => 'Lista użytkowników')->name('users.index');
+    Route::get('/orders', fn () => 'Lista zamówień')->name('orders.index');
+    Route::get('/products', fn () => 'Lista produktów')->name('products.index');
+    Route::get('/stats', fn () => 'Statystyki')->name('stats.index');
 });
 
-// Client
-Route::middleware(['auth', RoleMiddleware::class.':2'])->group(function () {
-    Route::get('/client', fn() => view('client.dashboard'))->name('client.dashboard');
+// PANEL KLIENTA
+Route::prefix('client')->middleware(['auth', RoleMiddleware::class . ':2'])->name('client.')->group(function () {
+    Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/orders', fn () => 'Moje zamówienia')->name('orders.index');
+    Route::get('/products', fn () => 'Produkty')->name('products.index');
 });
 
-// Staff
-Route::middleware(['auth', RoleMiddleware::class.':3'])->group(function () {
-    Route::get('/staff', fn() => view('staff.dashboard'))->name('staff.dashboard');
+// PANEL PRACOWNIKA
+Route::prefix('staff')->middleware(['auth', RoleMiddleware::class . ':3'])->name('staff.')->group(function () {
+    Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/orders', fn () => 'Zamówienia')->name('orders.index');
+    Route::get('/products', fn () => 'Produkty')->name('products.index');
+    Route::get('/stats', fn () => 'Statystyki')->name('stats.index');
 });
 
-// Profil użytkownika
+// PROFIL UŻYTKOWNIKA
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-Route::get('/dashboard', fn() => redirect()->route('redirect'))->name('dashboard');
