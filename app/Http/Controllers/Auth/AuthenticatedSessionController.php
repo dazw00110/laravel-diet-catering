@@ -26,11 +26,12 @@ class AuthenticatedSessionController extends Controller
             $user = Auth::user();
 
             return match ($user->user_type_id) {
-                1 => redirect()->intended('/admin'),
-                2 => redirect()->intended('/client'),
-                3 => redirect()->intended('/staff'),
+                1 => redirect()->intended(route('admin.dashboard')),
+                2 => redirect()->intended(route('client.dashboard')),
+                3 => redirect()->intended(route('staff.dashboard')),
                 default => abort(403),
             };
+
         }
 
         return back()->withErrors([
