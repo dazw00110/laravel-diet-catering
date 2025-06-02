@@ -55,7 +55,7 @@
         <div class="flex items-center justify-between mt-6">
             <div class="space-x-2">
                 <a href="{{ route('password.request') }}"
-                   class="text-sm text-gray-600 hover:text-gray-900 underline">
+                   class="text-sm text-gray-600 hover:text-gray-900 no-underline">
                     Resetuj hasło
                 </a>
             </div>
@@ -70,7 +70,7 @@
     <div class="text-center mt-6">
         <p class="text-sm text-gray-600">
             Nie masz konta?
-            <a href="{{ route('register') }}" class="text-green-700 font-semibold hover:underline">
+            <a href="{{ route('register') }}" class="text-green-700 font-semibold hover:text-green-800 no-underline">
                 Zarejestruj się
             </a>
         </p>
@@ -78,7 +78,8 @@
 
     <!-- Powrót na stronę główną -->
     <div class="text-center mt-3">
-        <a href="{{ route('home') }}" class="text-sm text-gray-600 hover:text-gray-900 underline">
+        <a href="{{ route('home') }}"
+           class="text-sm text-green-700 hover:text-green-800 no-underline font-medium">
             Powrót na stronę główną
         </a>
     </div>
