@@ -54,11 +54,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        switch ($user->user_type_id) {
-            case 1: return redirect('/admin');
-            case 2: return redirect('/client');
-            case 3: return redirect('/staff');
-            default: abort(403, 'Nieznana rola użytkownika.');
-        }
+        // Po rejestracji użytkownik musi skonfigurować TOTP
+        return redirect()->route('2fa.setup');
     }
 }
