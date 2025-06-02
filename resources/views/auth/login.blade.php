@@ -1,6 +1,21 @@
 <x-guest-layout>
-    <!-- Komunikat sesji -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+    <!-- Komunikaty -->
+    @if (session('status'))
+        <div class="mb-4 font-medium text-sm text-green-600 bg-green-50 border border-green-200 rounded p-3">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded p-3">
+            <ul class="list-disc pl-5 space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
@@ -38,13 +53,11 @@
 
         <!-- Akcje -->
         <div class="flex items-center justify-between mt-6">
-            <!-- Przyciski -->
             <div class="space-x-2">
-                <button type="button"
-                        onclick="alert('Funkcja resetowania hasła będzie dostępna wkrótce 😊')"
-                        class="text-sm text-gray-600 hover:text-gray-900 underline">
+                <a href="{{ route('password.request') }}"
+                   class="text-sm text-gray-600 hover:text-gray-900 no-underline">
                     Resetuj hasło
-                </button>
+                </a>
             </div>
 
             <x-primary-button>
@@ -57,9 +70,18 @@
     <div class="text-center mt-6">
         <p class="text-sm text-gray-600">
             Nie masz konta?
-            <a href="{{ route('register') }}" class="text-green-700 font-semibold hover:underline">
+            <a href="{{ route('register') }}" class="text-green-700 font-semibold hover:text-green-800 no-underline">
                 Zarejestruj się
             </a>
         </p>
     </div>
+
+    <!-- Powrót na stronę główną -->
+    <div class="text-center mt-3">
+        <a href="{{ route('home') }}"
+           class="text-sm text-green-700 hover:text-green-800 no-underline font-medium">
+            Powrót na stronę główną
+        </a>
+    </div>
+
 </x-guest-layout>

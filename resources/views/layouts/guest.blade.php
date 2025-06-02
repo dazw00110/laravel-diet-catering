@@ -46,15 +46,7 @@
     <div class="w-full max-w-xl overlay">
         {{ $slot }}
 
-        <!-- Przycisk resetowania hasła -->
-        @if (Route::has('password.request'))
-            <div class="text-center mt-6">
-                <a href="{{ route('password.request') }}"
-                   class="text-sm font-semibold text-green-700 hover:underline">
-                    Resetuj hasło
-                </a>
-            </div>
-        @endif
+
     </div>
 
 </body>
