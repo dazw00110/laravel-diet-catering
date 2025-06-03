@@ -9,11 +9,13 @@ use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\EnsureTotpVerified;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\TwoFactorController;
+use App\Http\Controllers\Admin\StatsController;
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\UserController;
 
 // Home Page
 Route::get('/', fn () => view('welcome'))->name('home');
@@ -81,9 +83,18 @@ Route::prefix('admin')
 
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
 
-        Route::get('/products', fn () => 'Product list')->name('products.index');
-        Route::get('/stats', fn () => 'Statistics')->name('stats.index');
+    Route::get('/products', fn () => 'Product list')->name('products.index');
+    Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
     });
+
+   // STATS
+    Route::prefix('admin')
+        ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':1'])
+        ->name('admin.')
+        ->group(function () {
+            Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
+    });
+
 
 // CLIENT PANEL
 Route::prefix('client')
@@ -95,16 +106,20 @@ Route::prefix('client')
         Route::get('/products', fn () => 'Produkty')->name('products.index');
     });
 
-// EMPLOYEE PANEL
-Route::prefix('staff')
-    ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':3'])
-    ->name('staff.')
-    ->group(function () {
-        Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/orders', fn () => 'Zamówienia')->name('orders.index');
-        Route::get('/products', fn () => 'Produkty')->name('products.index');
-        Route::get('/stats', fn () => 'Statystyki')->name('stats.index');
-    });
+
+
+// STAFF PANEL
+    Route::prefix('staff')
+        ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':3'])
+        ->name('staff.')
+        ->group(function () {
+            Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+            Route::get('/orders', fn () => 'Zamówienia')->name('orders.index');
+            Route::get('/products', fn () => 'Produkty')->name('products.index');
+            Route::get('/stats', [App\Http\Controllers\Staff\StatsController::class, 'index'])->name('stats.index');
+        });
+
+
 
 // USER PROFILE
 Route::middleware(['auth', EnsureTotpVerified::class])->group(function () {
