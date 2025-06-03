@@ -1,26 +1,6 @@
 @extends('layouts.admin')
 
-<style>
-@media print {
-    .no-print,
-    header,
-    nav,
-    aside {
-        display: none !important;
-    }
 
-    body {
-        background: white !important;
-        color: black !important;
-    }
-
-    canvas {
-        max-width: 100%;
-        display: block;
-        page-break-inside: avoid;
-    }
-}
-</style>
 
 @section('title', 'Statystyki sprzedaży')
 
