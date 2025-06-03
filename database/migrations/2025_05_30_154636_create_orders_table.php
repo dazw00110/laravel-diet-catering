@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->decimal('total_price', 8, 2);
-            $table->string('status')->default('pending'); // pending, confirmed, cancelled
+            $table->string('status')->default('unordered'); // unordered = koszyk, in_progress, completed, cancelled
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();

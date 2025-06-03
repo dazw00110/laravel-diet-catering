@@ -13,46 +13,59 @@ class OrderSeeder extends Seeder
         $faker = Faker::create();
 
         $clients = DB::table('users')
-            ->whereIn('user_type_id', function($query) {
+            ->whereIn('user_type_id', function ($query) {
                 $query->select('id')->from('user_types')->where('name', 'client');
             })->pluck('id');
 
         $products = DB::table('products')->get();
 
-        foreach (range(1, 15) as $i) {
-            $userId = $clients->random();
-            $startDate = $faker->dateTimeBetween('-1 month', '+1 week');
-            $endDate = (clone $startDate)->modify('+7 days');
+        $statuses = [
+            'completed' => 25,
+            'in_progress' => 20,
+            'unordered' => 30,
+            'cancelled' => 10,
+        ];
 
-            $orderId = DB::table('orders')->insertGetId([
-                'user_id' => $userId,
-                'total_price' => 0,
-                'status' => $faker->randomElement(['pending', 'confirmed']),
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        foreach ($statuses as $status => $count) {
+            for ($i = 0; $i < $count; $i++) {
+                $userId = $clients->random();
+                $days = $faker->numberBetween(5, 14);
+                $startDate = $faker->dateTimeBetween('-3 months', 'now');
+                $endDate = (clone $startDate)->modify("+{$days} days");
 
-            $total = 0;
-
-            foreach ($products->random(rand(1, 3)) as $product) {
-                $qty = rand(1, 2);
-                $price = $product->price;
-
-                DB::table('order_items')->insert([
-                    'order_id' => $orderId,
-                    'product_id' => $product->id,
-                    'quantity' => $qty,
-                    'unit_price' => $price,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                $orderId = DB::table('orders')->insertGetId([
+                    'user_id'     => $userId,
+                    'total_price' => 0,
+                    'status'      => $status,
+                    'start_date'  => $startDate,
+                    'end_date'    => $endDate,
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
                 ]);
 
-                $total += $qty * $price;
-            }
+                $total = 0;
+                $itemCount = min(rand(1, 5), $products->count());
 
-            DB::table('orders')->where('id', $orderId)->update(['total_price' => $total]);
+                foreach ($products->random($itemCount) as $product) {
+                    $qty = $faker->numberBetween(1, 4);
+                    $price = $product->price;
+
+                    DB::table('order_items')->insert([
+                        'order_id'   => $orderId,
+                        'product_id' => $product->id,
+                        'quantity'   => $qty,
+                        'unit_price' => $price,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    $total += $qty * $price * $days;
+                }
+
+                DB::table('orders')->where('id', $orderId)->update([
+                    'total_price' => round($total, 2),
+                ]);
+            }
         }
     }
 }

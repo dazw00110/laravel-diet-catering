@@ -6,11 +6,12 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Controllers\Auth\PasswordResetController;
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
-use App\Http\Controllers\Auth\PasswordResetController;
 
 // Strona główna
 Route::get('/', fn () => view('welcome'))->name('home');
@@ -39,17 +40,35 @@ Route::get('/redirect', RedirectController::class)
     ->middleware('auth')
     ->name('redirect');
 
-// Dashboard ogólny 
+// Dashboard ogólny
 Route::get('/dashboard', fn () => redirect()->route('redirect'))->name('dashboard');
 
 // PANEL ADMINISTRATORA
 Route::prefix('admin')->middleware(['auth', RoleMiddleware::class . ':1'])->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/users', fn () => 'Lista użytkowników')->name('users.index');
-    Route::get('/orders', fn () => 'Lista zamówień')->name('orders.index');
+
+    Route::get('/orders/create', [AdminOrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [AdminOrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}/edit', [AdminOrderController::class, 'edit'])->name('orders.edit');
+    Route::put('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
+    Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+    Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:1'])->group(function () {
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
+    Route::patch('orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
+});
+    Route::put('/admin/orders/{order}', [AdminOrderController::class, 'update'])->name('admin.orders.update');
+
+    Route::post('/orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
+
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+
     Route::get('/products', fn () => 'Lista produktów')->name('products.index');
     Route::get('/stats', fn () => 'Statystyki')->name('stats.index');
 });
+
 
 // PANEL KLIENTA
 Route::prefix('client')->middleware(['auth', RoleMiddleware::class . ':2'])->name('client.')->group(function () {
