@@ -13,7 +13,6 @@ return new class extends Migration {
             $table->text('description');
             $table->decimal('price', 8, 2);
             $table->integer('calories');
-            $table->foreignId('category_id')->constrained('categories');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

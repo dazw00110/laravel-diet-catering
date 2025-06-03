@@ -14,16 +14,10 @@ class Product extends Model
     'description',
     'price',
     'calories',
-    'category_id',
     'is_active',
     'is_vegan',
     'is_vegetarian',
 ];
-
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
 
     public function orderItems()
     {

@@ -20,7 +20,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
             <label class="block text-gray-700">Nazwa</label>
-            <input type="text" name="name" placeholder="Dieta 0000 kcal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ old('name') }}" required>
+            <input type="text" name="name" placeholder="Dieta" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ old('name') }}" required>
         </div>
 
         <div>
@@ -34,8 +34,7 @@
         </div>
 
         <div>
-            <label class="block text-gray-700">ID kategorii</label>
-            <input type="number" name="category_id" placeholder="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ old('category_id') }}">
+
         </div>
 
         <div>

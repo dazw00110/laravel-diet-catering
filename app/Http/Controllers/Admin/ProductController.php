@@ -47,7 +47,7 @@ public function index(Request $request)
         $sort = $request->get('sort');
         $dir = $request->get('dir', 'asc');
 
-        if (in_array($sort, ['name', 'price', 'calories', 'category_id'])) {
+        if (in_array($sort, ['name', 'price', 'calories', 'id'])) {
             $query->orderBy($sort, $dir);
         }
     } else {
@@ -71,7 +71,6 @@ public function index(Request $request)
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'calories' => 'required|integer|min:0',
-            'category_id' => 'required|integer|exists:categories,id',
             'is_vegan' => 'boolean',
             'is_vegetarian' => 'boolean',
         ]);
@@ -93,7 +92,6 @@ public function index(Request $request)
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'calories' => 'required|integer|min:0',
-            'category_id' => 'required|integer|exists:categories,id',
             'is_vegan' => 'boolean',
             'is_vegetarian' => 'boolean',
         ]);

@@ -35,8 +35,7 @@
         </div>
 
         <div>
-            <label class="block text-gray-700">ID kategorii</label>
-            <input type="number" name="category_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ old('category_id', $product->category_id) }}">
+
         </div>
 
         <div>

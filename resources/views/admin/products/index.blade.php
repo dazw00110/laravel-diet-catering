@@ -81,7 +81,7 @@
 <table class="min-w-full bg-white shadow rounded">
     <thead>
         <tr>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('category_id') }}" class="hover:underline">Kategoria ID {{ sort_icon('category_id') }}</a></th>
+            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('id') }}" class="hover:underline">ID {{ sort_icon('id') }}</a></th>
             <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('name') }}" class="hover:underline">Nazwa {{ sort_icon('name') }}</a></th>
             <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('price') }}" class="hover:underline">Cena {{ sort_icon('price') }}</a></th>
             <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('calories') }}" class="hover:underline">Kcal {{ sort_icon('calories') }}</a></th>
@@ -93,7 +93,7 @@
     <tbody>
         @forelse($products as $product)
             <tr>
-                <td class="p-2 border-b text-center">{{ $product->category_id ?? '-' }}</td>
+                <td class="p-2 border-b text-center">{{ $product->id }}</td>
                 <td class="p-2 border-b text-center">{{ $product->name }}</td>
                 <td class="p-2 border-b text-center">{{ $product->price }} zł</td>
                 <td class="p-2 border-b text-center">{{ $product->calories ?? '-' }}</td>
