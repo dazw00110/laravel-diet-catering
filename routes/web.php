@@ -72,8 +72,9 @@ Route::prefix('admin')
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:1'])->group(function () {
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
-    Route::patch('orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
 });
+    Route::post('/admin/orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('admin.orders.cancel');
+
     Route::put('/admin/orders/{order}', [AdminOrderController::class, 'update'])->name('admin.orders.update');
 
     Route::post('/orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');

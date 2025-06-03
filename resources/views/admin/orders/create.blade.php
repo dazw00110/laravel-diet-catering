@@ -236,7 +236,7 @@ function orderForm() {
 
             this.totalBeforeFinal = total;
 
-            // 4+1 gratis
+            // 4+1 free item bonus
             const productsCount = {};
             this.freeItemBonus = 0;
             for (const item of this.items) {

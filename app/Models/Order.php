@@ -33,13 +33,13 @@ class Order extends Model
         return $this->hasOne(Cancellation::class);
     }
 
-    // Pobiera tylko "koszykowe" zamówienia
+    // get unordered orders
     public function scopeUnordered($query)
     {
         return $query->where('status', 'unordered');
     }
 
-    // Pobiera lub tworzy "koszykowe" zamówienie użytkownika
+    // get or create a cart for a user
     public static function getOrCreateCartForUser($userId)
     {
         return self::firstOrCreate(

@@ -109,23 +109,32 @@
                     <a href="{{ route('admin.orders.show', $order) }}" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Pokaż</a>
                     <a href="{{ route('admin.orders.edit', $order) }}" class="bg-yellow-400 text-white px-2 py-1 rounded text-sm hover:bg-yellow-500">Edytuj</a>
                     <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="inline">
-                        @csrf @method('DELETE')
-                        <button onclick="return confirm('Na pewno?')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Usuń</button>
-                    </form>
-                    <form action="{{ route('admin.orders.cancel', $order) }}" method="POST" class="inline">
-                    @csrf @method('PATCH')
-                        <button
-                            @if ($order->status === 'cancelled' || !$order->user->is_active)
-                                disabled
-                                class="bg-gray-300 text-white px-2 py-1 rounded text-sm opacity-50 cursor-not-allowed"
-                            @else
-                                onclick="return confirm('Czy na pewno anulować to zamówienie?')"
-                                class="bg-gray-500 text-white px-2 py-1 rounded text-sm hover:bg-gray-600"
-                            @endif
-                        >
-                            Anuluj
-                        </button>
-                     </form>
+    @csrf @method('DELETE')
+    <button onclick="return confirm('Na pewno?')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Usuń</button>
+</form>
+
+@php
+    $canCancel = $order->status === 'in_progress';
+@endphp
+
+<form action="{{ route('admin.orders.cancel', $order) }}" method="POST" class="inline">
+    @csrf
+    <button
+        @if ($order->status === 'in_progress')
+            onclick="return confirm('Czy na pewno anulować to zamówienie?')"
+            class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-sm"
+        @else
+            disabled
+            title="Można anulować tylko zamówienia w trakcie"
+            class="bg-gray-300 text-white px-2 py-1 rounded text-sm opacity-50 cursor-not-allowed"
+        @endif
+    >
+        Anuluj
+    </button>
+</form>
+
+
+
 
                 </td>
             </tr>

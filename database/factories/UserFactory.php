@@ -20,7 +20,7 @@ class UserFactory extends Factory
             'last_name' => $this->faker->lastName(),
             'email' => $this->faker->unique()->safeEmail(),
             'birth_date' => $this->faker->date('Y-m-d', '-18 years'),
-            'user_type_id' => 2, // klient domyślnie
+            'user_type_id' => 2, // Assuming 2 is the ID for 'user' type
             'is_vegan' => $this->faker->boolean(20),
             'is_vegetarian' => $this->faker->boolean(30),
             'password' => static::$password ??= Hash::make('password'),

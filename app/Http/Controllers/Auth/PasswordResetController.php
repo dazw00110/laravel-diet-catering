@@ -65,7 +65,7 @@ class PasswordResetController extends Controller
                 ->withErrors(['email' => 'Ten link już został użyty lub jest nieprawidłowy.']);
         }
 
-        // Sprawdzenie ważności tokenu – 30 minut
+        // check if the token is older than 30 minutes
         if (now()->diffInMinutes($record->created_at) > 30) {
             return redirect()->route('password.request')
                 ->withErrors(['email' => 'Token wygasł. Proszę wygenerować nowy.']);

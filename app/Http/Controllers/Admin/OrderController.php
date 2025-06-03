@@ -43,11 +43,12 @@ class OrderController extends Controller
         $query = Order::with(['user', 'items.product']);
 
         if ($request->filled('client')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('first_name', 'like', '%' . $request->client . '%')
-                  ->orWhere('last_name', 'like', '%' . $request->client . '%');
-            });
-        }
+        $clientInput = strtolower($request->client);
+        $query->whereHas('user', function ($q) use ($clientInput) {
+            $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$clientInput}%"])
+            ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$clientInput}%"]);
+        });
+}
 
         if ($request->filled('min_price')) {
             $query->where('total_price', '>=', $request->min_price);
@@ -154,7 +155,7 @@ class OrderController extends Controller
                     $totalPrice -= $discountValue;
                 }
 
-                // Tworzymy nowy kod
+                // Create a new discount code
                 $newDiscountCode = strtoupper(Str::random(6));
                 Discount::create([
                     'code' => $newDiscountCode,
@@ -274,7 +275,7 @@ class OrderController extends Controller
                         $totalPrice -= $discountValue;
                     }
 
-                    // Tworzymy nowy kod
+                    // Create a new discount code
                     $newDiscountCode = strtoupper(Str::random(6));
                     Discount::create([
                         'code' => $newDiscountCode,
@@ -349,15 +350,17 @@ class OrderController extends Controller
     }
 
     public function cancel(Order $order)
-    {
-        if ($order->status !== 'cancelled') {
-            $order->update(['status' => 'cancelled']);
-            Cancellation::updateOrCreate(
-                ['order_id' => $order->id],
-                ['reason' => 'Anulowano przez system']
-            );
-        }
+{
+    if ($order->status !== 'cancelled') {
+        $order->update(['status' => 'cancelled']);
 
-        return redirect()->route('admin.orders.index')->with('success', 'Zamówienie anulowane.');
+        Cancellation::updateOrCreate(
+            ['order_id' => $order->id],
+            ['reason' => 'Anulowano przez system']
+        );
     }
+
+    return redirect()->route('admin.orders.index')->with('success', 'Zamówienie anulowane.');
+}
+
 }

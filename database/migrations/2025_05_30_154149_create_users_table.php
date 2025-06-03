@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->string('avatar_url', 255)->nullable();
 
             $table->rememberToken();
-            $table->timestamps(); // zamiast ręcznego created_at + updated_at
+            $table->timestamps();
         });
     }
 
