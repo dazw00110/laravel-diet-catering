@@ -54,7 +54,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        // Po rejestracji użytkownik musi skonfigurować TOTP
+        // After registration, the user must configure TOTP
         return redirect()->route('2fa.setup');
     }
 }

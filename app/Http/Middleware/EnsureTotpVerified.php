@@ -14,7 +14,7 @@ class EnsureTotpVerified
             $user = Auth::user();
 
         if (app()->environment('local')) {
-            return $next($request); // TOTP omijane lokalnie
+            return $next($request); // TOTP bypassed locally
         }
 
         if (!$user->totp_secret) {
