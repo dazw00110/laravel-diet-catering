@@ -14,6 +14,9 @@ class ProductSeeder extends Seeder
         $categories = DB::table('categories')->pluck('id');
 
         foreach (range(1, 20) as $i) {
+            $isVegan = $faker->boolean(30);
+            $isVegetarian = $isVegan ? true : $faker->boolean(60);
+
             DB::table('products')->insert([
                 'name' => 'Dieta ' . $faker->numberBetween(1200, 3500) . ' kcal',
                 'description' => $faker->sentence(12),
@@ -21,6 +24,8 @@ class ProductSeeder extends Seeder
                 'calories' => $faker->numberBetween(1200, 3500),
                 'category_id' => $categories->random(),
                 'is_active' => $faker->boolean(90),
+                'is_vegan' => $isVegan,
+                'is_vegetarian' => $isVegetarian,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

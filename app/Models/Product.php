@@ -10,13 +10,15 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'calories',
-        'category_id',
-        'is_active',
-    ];
+    'name',
+    'description',
+    'price',
+    'calories',
+    'category_id',
+    'is_active',
+    'is_vegan',
+    'is_vegetarian',
+];
 
     public function category()
     {
@@ -33,8 +35,4 @@ class Product extends Model
         return $this->hasMany(ProductReview::class);
     }
 
-    public function purchaseHistory()
-    {
-        return $this->hasMany(PurchaseHistory::class);
-    }
 }

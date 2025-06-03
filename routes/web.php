@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\TwoFactorController;
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 
@@ -48,24 +49,43 @@ Route::get('/redirect', RedirectController::class)
     ->middleware(['auth', EnsureTotpVerified::class])
     ->name('redirect');
 
-// General dashboard (redirects to role)
+// General dashboard
 Route::get('/dashboard', fn () => redirect()->route('redirect'))
     ->middleware(['auth', EnsureTotpVerified::class])
     ->name('dashboard');
 
-// ADMINISTRATOR PANEL
+// ADMIN PANEL
 Route::prefix('admin')
     ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':1'])
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/users', fn () => 'Lista użytkowników')->name('users.index');
-        Route::get('/orders', fn () => 'Lista zamówień')->name('orders.index');
-        Route::get('/products', fn () => 'Lista produktów')->name('products.index');
-        Route::get('/stats', fn () => 'Statystyki')->name('stats.index');
+        Route::get('/users', fn () => 'User list')->name('users.index');
+
+        // Full CRUD for Orders
+
+    Route::get('/orders/create', [AdminOrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [AdminOrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}/edit', [AdminOrderController::class, 'edit'])->name('orders.edit');
+    Route::put('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
+    Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+    Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:1'])->group(function () {
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
+});
+    Route::post('/admin/orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('admin.orders.cancel');
+
+    Route::put('/admin/orders/{order}', [AdminOrderController::class, 'update'])->name('admin.orders.update');
+
+    Route::post('/orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
+
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+
+        Route::get('/products', fn () => 'Product list')->name('products.index');
+        Route::get('/stats', fn () => 'Statistics')->name('stats.index');
     });
 
-// CUSTOMER PANEL
+// CLIENT PANEL
 Route::prefix('client')
     ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':2'])
     ->name('client.')
@@ -93,7 +113,7 @@ Route::middleware(['auth', EnsureTotpVerified::class])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// LOCAL DEV ROUTES
+// TESTOWE WIDOKI BŁĘDÓW (tylko w trybie local)
 if (app()->environment('local')) {
     // Disable TOTP manually
     Route::post('/2fa/disable', function () {

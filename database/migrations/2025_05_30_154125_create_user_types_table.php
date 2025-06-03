@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name', 50); // 'admin', 'client', 'staff'
             $table->timestamps();
+
         });
     }
 

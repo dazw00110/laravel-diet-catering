@@ -9,7 +9,14 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'total_price', 'start_date', 'end_date', 'status'];
+    protected $fillable = [
+        'user_id',
+        'status',
+        'start_date',
+        'end_date',
+        'total_price',
+        'discount_code',
+    ];
 
     public function user()
     {
@@ -21,13 +28,23 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function cancellations()
+    public function cancellation()
     {
-        return $this->hasMany(Cancellation::class);
+        return $this->hasOne(Cancellation::class);
     }
 
-    public function cateringDays()
+    // get unordered orders
+    public function scopeUnordered($query)
     {
-        return $this->hasMany(CateringCalendar::class);
+        return $query->where('status', 'unordered');
+    }
+
+    // get or create a cart for a user
+    public static function getOrCreateCartForUser($userId)
+    {
+        return self::firstOrCreate(
+            ['user_id' => $userId, 'status' => 'unordered'],
+            ['total_price' => 0, 'start_date' => now(), 'end_date' => now()]
+        );
     }
 }

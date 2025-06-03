@@ -12,7 +12,6 @@ class CategorySeeder extends Seeder
         DB::table('categories')->insert([
             ['name' => 'Standard'],
             ['name' => 'Wege'],
-            ['name' => 'Sport'],
             ['name' => 'Keto'],
         ]);
     }

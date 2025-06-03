@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
+// DatabaseSeeder
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
@@ -14,11 +15,8 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ProductSeeder::class,
             OrderSeeder::class,
-            CartSeeder::class,
-            PurchaseHistorySeeder::class,
             DiscountSeeder::class,
             CancellationSeeder::class,
-            CateringCalendarSeeder::class,
             ProductReviewSeeder::class,
         ]);
     }

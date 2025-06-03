@@ -46,7 +46,7 @@ class UserSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Client
+        // Demo Client
         DB::table('users')->insert([
             'first_name' => 'Client',
             'last_name' => 'User',
@@ -62,8 +62,8 @@ class UserSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Staff x3
-        for ($i = 1; $i <= 3; $i++) {
+        // Staff x5
+        for ($i = 1; $i <= 5; $i++) {
             DB::table('users')->insert([
                 'first_name' => $faker->firstName,
                 'last_name' => $faker->lastName,
@@ -80,8 +80,8 @@ class UserSeeder extends Seeder
             ]);
         }
 
-        // Clients x15
-        for ($i = 1; $i <= 15; $i++) {
+        // Clients x50
+        for ($i = 1; $i <= 50; $i++) {
             DB::table('users')->insert([
                 'first_name' => $faker->firstName,
                 'last_name' => $faker->lastName,
