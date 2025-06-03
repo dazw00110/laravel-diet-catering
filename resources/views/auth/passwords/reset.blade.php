@@ -1,7 +1,7 @@
 <x-guest-layout>
     <h2 class="text-xl font-semibold mb-4">Ustaw nowe hasło</h2>
 
-    <!-- Komunikaty -->
+    <!-- Communicates -->
     @if (session('status'))
         <div class="mb-4 font-medium text-sm text-green-600 bg-green-50 border border-green-200 rounded p-3">
             {{ session('status') }}
@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    <!-- Formularz -->
+    <!-- Form -->
     <form method="POST" action="{{ route('password.update') }}">
         @csrf
         <input type="hidden" name="token" value="{{ $token }}">

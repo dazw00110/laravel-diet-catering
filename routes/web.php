@@ -112,7 +112,7 @@ Route::middleware(['auth', EnsureTotpVerified::class])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// LOCAL DEV ROUTES
+// TESTOWE WIDOKI BŁĘDÓW (tylko w trybie local)
 if (app()->environment('local')) {
     // Disable TOTP manually
     Route::post('/2fa/disable', function () {

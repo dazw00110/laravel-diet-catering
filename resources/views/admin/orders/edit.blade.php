@@ -214,7 +214,7 @@ function orderForm() {
 
             this.totalBeforeFinal = total;
 
-            // 4+1 gratis
+            // 4+1 free item bonus
             this.freeItemBonus = 0;
             const countByProduct = {};
             for (const i of this.items) {
@@ -229,19 +229,19 @@ function orderForm() {
             }
             total -= this.freeItemBonus;
 
-            // rabat -10% / -15%
+            // - 10% or -15% for high total
             if (this.totalBeforeFinal >= 3000) {
                 total *= 0.85;
             } else if (this.totalBeforeFinal >= 2000) {
                 total *= 0.90;
             }
 
-            // rabat -5% lojalność
+            // -5% for recent orders
             if (this.recentOrders >= 3) {
                 total *= 0.95;
             }
 
-            // kod rabatowy
+            // Discount code
             if (this.discount) {
                 if (this.discount.type === 'percentage') {
                     total *= 1 - this.discount.value / 100;

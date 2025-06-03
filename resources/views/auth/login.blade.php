@@ -1,6 +1,6 @@
 <x-guest-layout>
 
-    <!-- Komunikaty -->
+    <!-- Communicates -->
     @if (session('status'))
         <div class="mb-4 font-medium text-sm text-green-600 bg-green-50 border border-green-200 rounded p-3">
             {{ session('status') }}
@@ -20,7 +20,7 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Adres e-mail -->
+        <!-- e-mail -->
         <div>
             <x-input-label for="email" :value="'Adres e-mail'" />
             <x-text-input id="email" class="block mt-1 w-full"
@@ -31,7 +31,7 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- Hasło -->
+        <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="'Hasło'" />
             <x-text-input id="password" class="block mt-1 w-full"
@@ -41,7 +41,7 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <!-- Zapamiętaj mnie -->
+        <!-- Remember me -->
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox"
@@ -51,7 +51,7 @@
             </label>
         </div>
 
-        <!-- Akcje -->
+        <!-- Action -->
         <div class="flex items-center justify-between mt-6">
             <div class="space-x-2">
                 <a href="{{ route('password.request') }}"
@@ -66,7 +66,7 @@
         </div>
     </form>
 
-    <!-- Rejestracja -->
+    <!-- Register -->
     <div class="text-center mt-6">
         <p class="text-sm text-gray-600">
             Nie masz konta?
@@ -76,7 +76,7 @@
         </p>
     </div>
 
-    <!-- Powrót na stronę główną -->
+    <!-- Back to main page -->
     <div class="text-center mt-3">
         <a href="{{ route('home') }}"
            class="text-sm text-green-700 hover:text-green-800 no-underline font-medium">

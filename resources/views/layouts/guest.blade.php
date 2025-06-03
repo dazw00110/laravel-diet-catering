@@ -32,7 +32,7 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center px-4 py-8 text-gray-900">
 
-    <!-- Nazwa cateringu -->
+    <!-- Catering name -->
     <div class="mb-6 text-center header-overlay text-white">
         <h1 class="text-4xl font-extrabold drop-shadow-md">
             FitBox Catering
@@ -42,7 +42,7 @@
         </p>
     </div>
 
-    <!-- Formularz logowania/rejestracji -->
+    <!-- Form -->
     <div class="w-full max-w-xl overlay">
         {{ $slot }}
 
