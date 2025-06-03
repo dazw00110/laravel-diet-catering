@@ -112,16 +112,16 @@ Route::prefix('client')
 
 
 // STAFF PANEL
-    Route::prefix('staff')
-        ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':3'])
-        ->name('staff.')
-        ->group(function () {
-            Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
-            Route::get('/orders', fn () => 'Zamówienia')->name('orders.index');
-            Route::get('/products', fn () => 'Produkty')->name('products.index');
-            Route::get('/stats', [App\Http\Controllers\Staff\StatsController::class, 'index'])->name('stats.index');
-        });
+Route::prefix('staff')
+    ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':3'])
+    ->name('staff.')
+    ->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Staff\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/stats', [\App\Http\Controllers\Staff\StatsController::class, 'index'])->name('stats.index');
+        Route::resource('products', \App\Http\Controllers\Staff\ProductController::class)->only(['index', 'edit', 'update']);
+        Route::get('/orders', fn () => view('staff.orders.index'))->name('orders.index');
 
+    });
 
 
 // USER PROFILE
