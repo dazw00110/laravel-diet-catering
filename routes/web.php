@@ -64,6 +64,9 @@ Route::prefix('admin')
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/users', fn () => 'User list')->name('users.index');
 
+        //CRUD for Products
+    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class)->except('show');
+
         // Full CRUD for Orders
 
     Route::get('/orders/create', [AdminOrderController::class, 'create'])->name('orders.create');
@@ -83,8 +86,8 @@ Route::prefix('admin')
 
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
 
-    Route::get('/products', fn () => 'Product list')->name('products.index');
     Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
+
     });
 
    // STATS
