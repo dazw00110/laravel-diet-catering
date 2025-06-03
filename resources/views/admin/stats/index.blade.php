@@ -8,7 +8,6 @@
 <div class="max-w-6xl mx-auto bg-white shadow-md p-6 rounded space-y-6 print-section">
     <h1 class="text-2xl font-bold mb-4">📊 Statystyki sprzedaży (Admin)</h1>
 
-    {{-- 🔍 FILTR --}}
     <div x-data="{ loading: false }" class="bg-gray-100 p-4 rounded">
         <form @change="loading = true; $event.target.form.submit()" method="GET">
             <div class="flex flex-col md:flex-row gap-4 items-center">
@@ -30,7 +29,7 @@
         </form>
     </div>
 
-    {{-- 📆 PODSUMOWANIE MIESIĄCA --}}
+    {{-- Monthly summary --}}
     <h2 class="font-semibold text-xl mt-4">📅 {{ $monthName }} (status: {{ $selectedStatus }})</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>📦 Zamówień: <strong>{{ $ordersTotal }}</strong></div>
@@ -39,7 +38,7 @@
         <div>👥 Klientów: <strong>{{ $uniqueClients }}</strong></div>
     </div>
 
-    {{-- 🔁 PORÓWNANIE DO POPRZEDNIEGO MIESIĄCA --}}
+    {{-- vs previous month --}}
     <h2 class="font-semibold text-lg mt-6">📊 Porównanie z {{ $prevMonthName }}</h2>
     <ul class="list-disc list-inside">
         <li>Zamówień: {{ $ordersTotal }} (poprzednio: {{ $previousOrdersTotal }})</li>
@@ -47,7 +46,7 @@
         <li>Średnia cena: {{ number_format($averageValue, 2, ',', ' ') }} zł (poprzednio: {{ number_format($previousAverageValue, 2, ',', ' ') }} zł)</li>
     </ul>
 
-    {{-- 🏆 TOP 5 NAJCZĘŚCIEJ PŁACĄCYCH KLIENTÓW --}}
+ {{-- Top 5 clients by spend --}}
 <h2 class="font-semibold text-lg mt-6">🏅 Top 5 klientów wg wydanej kwoty</h2>
 <table class="table-auto w-full border text-sm">
     <thead class="bg-gray-100">
@@ -73,7 +72,7 @@
 </table>
 
 
-    {{-- 🛍️ TOP 5 KLIENTÓW WG ILOŚCI ZAMÓWIEŃ --}}
+    {{-- TOP 5 CLIENTS BY ORDERS --}}
     <h2 class="font-semibold text-lg mt-6">🧾 Top 5 klientów wg liczby zamówień</h2>
     <table class="table-auto w-full border text-sm">
         <thead class="bg-gray-100">
@@ -95,7 +94,7 @@
     </table>
 
 
-    {{-- 🍽️ TOP 5 NAJCZĘŚCIEJ ZAMAWIANYCH PRODUKTÓW --}}
+    {{-- TOP 5 MOST ORDERED PRODUCTS --}}
     <h2 class="font-semibold text-lg mt-6">🍽️ Najczęściej zamawiane produkty</h2>
     <table class="table-auto w-full border text-sm">
         <thead class="bg-gray-100">
@@ -116,7 +115,7 @@
         </tbody>
     </table>
 
-    {{-- 💎 TOP 5 NAJDROŻSZYCH ZAMÓWIEŃ --}}
+    {{-- TOP 5 MOST EXPENSIVE ORDERS --}}
     <h2 class="font-semibold text-lg mt-6">💎 Najdroższe zamówienia</h2>
     <table class="table-auto w-full border text-sm">
         <thead class="bg-gray-100">
@@ -139,11 +138,11 @@
         </tbody>
     </table>
 
-    {{-- 📊 Wykres: Top 5 klientów wg wydatków --}}
+    {{-- TOP 5 CLIENTS BY SPEND --}}
     <h2 class="font-semibold text-lg mt-6">📊 Wydatki – Top 5 klientów</h2>
     <canvas id="clientChart" height="100"></canvas>
 
-    {{-- 🥧 Wykres: Top 5 produktów wg ilości --}}
+    {{-- Chart for most ordered products --}}
 <h2 class="font-semibold text-lg mt-6">🥧 Najczęściej zamawiane produkty</h2>
 <div class="max-w-sm mx-auto">
     <canvas id="productChart" class="mx-auto" width="300" height="300" style="max-width: 300px; aspect-ratio: 1;"></canvas>
