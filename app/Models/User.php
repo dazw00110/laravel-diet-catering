@@ -21,9 +21,10 @@ class User extends Authenticatable
         'is_vegan',
         'is_vegetarian',
         'avatar_url',
+        'totp_secret', // TOTP
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'totp_secret']; // hide TOTP from JSON serialization
 
     protected $casts = [
         'email_verified_at' => 'datetime',
