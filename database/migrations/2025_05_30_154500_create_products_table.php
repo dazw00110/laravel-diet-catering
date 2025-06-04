@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name', 255);
             $table->text('description');
+            $table->string('image_path')->default('products/default.png')->after('description');
             $table->decimal('price', 8, 2);
             $table->integer('calories');
             $table->boolean('is_active')->default(true);
