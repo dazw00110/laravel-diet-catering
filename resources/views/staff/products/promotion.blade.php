@@ -8,6 +8,32 @@
                          $product->promotion_expires_at &&
                          $product->promotion_expires_at->isFuture();
     $currentPrice = $hasActivePromotion ? $product->promotion_price : $product->price;
+
+    function formatTimeRemainingPolish($expiresAt) {
+        if (!$expiresAt) return '';
+
+        $now = now();
+        $expires = \Carbon\Carbon::parse($expiresAt);
+
+        if ($expires->isPast()) {
+            return 'Promocja wygasła';
+        }
+
+        $diff = $now->diff($expires);
+
+        if ($diff->days > 0) {
+            $daysText = $diff->days == 1 ? 'dzień' : ($diff->days < 5 ? 'dni' : 'dni');
+            $hoursText = $diff->h == 1 ? 'godzinę' : ($diff->h < 5 ? 'godziny' : 'godzin');
+            return $diff->days . ' ' . $daysText . ' i ' . $diff->h . ' ' . $hoursText;
+        } elseif ($diff->h > 0) {
+            $hoursText = $diff->h == 1 ? 'godzinę' : ($diff->h < 5 ? 'godziny' : 'godzin');
+            $minutesText = $diff->i == 1 ? 'minutę' : ($diff->i < 5 ? 'minuty' : 'minut');
+            return $diff->h . ' ' . $hoursText . ' i ' . $diff->i . ' ' . $minutesText;
+        } else {
+            $minutesText = $diff->i == 1 ? 'minutę' : ($diff->i < 5 ? 'minuty' : 'minut');
+            return $diff->i . ' ' . $minutesText;
+        }
+    }
 @endphp
 
 <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
@@ -24,7 +50,7 @@
                     <p class="text-sm">
                         Cena promocyjna: <strong>{{ number_format($product->promotion_price, 2) }} zł</strong><br>
                         Wygasa: <strong>{{ $product->promotion_expires_at->format('H:i d.m.Y') }}</strong>
-                        (za {{ $product->promotion_expires_at->diffForHumans() }})
+                        (za {{ formatTimeRemainingPolish($product->promotion_expires_at) }})
                     </p>
                 </div>
                 <form method="POST" action="{{ route('staff.products.promotion.remove', $product) }}" class="ml-4">

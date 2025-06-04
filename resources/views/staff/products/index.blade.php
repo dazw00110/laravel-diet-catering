@@ -9,25 +9,38 @@
     display: inline-block;
     color: #22c55e !important;
     font-weight: bold;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
     cursor: pointer;
 }
 
 .tooltip {
     position: absolute;
+    z-index: 10;
+    width: 18rem;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    text-align: left;
+    color: #1f2937;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #1f2937;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-container:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
 }
 
 .tooltip::after {
@@ -37,12 +50,7 @@
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-top-color: #1f2937;
-}
-
-.promotion-price:hover .tooltip {
-    opacity: 1;
-    visibility: visible;
+    border-top-color: white;
 }
 
 .expired-promotion {
@@ -56,14 +64,18 @@
     cursor: not-allowed;
 }
 
-.blocked-edit-button .tooltip {
-    width: 200px;
-    white-space: normal;
+.info-icon {
+    color: #2563eb;
+    font-weight: bold;
+    font-size: 1.125rem;
+    margin-left: 0.25rem;
 }
 
-.blocked-edit-button:hover .tooltip {
-    opacity: 1;
-    visibility: visible;
+.price-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
 }
 </style>
 
@@ -156,6 +168,12 @@
             return $diff->i . ' minut';
         }
     }
+
+    // Generate URL with current parameters for promotion links
+    function generate_promotion_url($route, $product) {
+        $currentParams = request()->query();
+        return route($route, $product) . '?' . http_build_query($currentParams);
+    }
 @endphp
 
 <table class="min-w-full bg-white shadow rounded">
@@ -185,11 +203,17 @@
                 <td class="p-2 border-b text-center">{{ $product->name }}</td>
                 <td class="p-2 border-b text-center">
                     @if($hasActivePromotion)
-                        <div class="promotion-price">
-                            {{ number_format($product->promotion_price, 2) }} zł
-                            <div class="tooltip">
-                                <strong>Cena oryginalna:</strong> {{ number_format($product->price, 2) }} zł<br>
-                                <strong>Pozostało:</strong> {{ formatTimeRemaining($product->promotion_expires_at) }}
+                        <div class="price-display">
+                            <span class="promotion-price">{{ number_format($product->promotion_price, 2) }} zł</span>
+                            <div class="tooltip-container">
+                                <span class="info-icon">ℹ️</span>
+                                <div class="tooltip">
+                                    <p><strong>Informacje o promocji:</strong></p>
+                                    <ul class="list-disc list-inside mt-1">
+                                        <li><strong>Cena oryginalna:</strong> {{ number_format($product->price, 2) }} zł</li>
+                                        <li><strong>Pozostało:</strong> {{ formatTimeRemaining($product->promotion_expires_at) }}</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     @elseif($hasExpiredPromotion)
@@ -217,22 +241,23 @@
                 </td>
                 <td class="p-2 border-b text-center space-y-1 space-x-1">
                     @if($hasActivePromotion)
-                        <div class="blocked-edit-button">
+                        <div class="tooltip-container blocked-edit-button">
                             <span class="bg-gray-400 text-white px-2 py-1 rounded text-sm cursor-not-allowed opacity-60">Edytuj</span>
+                            <span class="info-icon">ℹ️</span>
                             <div class="tooltip">
-                                <strong>Edycja zablokowana</strong><br>
-                                Aby edytować produkt, musisz najpierw usunąć aktywną promocję lub poczekać aż wygaśnie.<br>
-                                <strong>Promocja kończy się za:</strong> {{ formatTimeRemaining($product->promotion_expires_at) }}
+                                <p><strong>Edycja zablokowana</strong></p>
+                                <p class="mt-1">Aby edytować produkt, musisz najpierw usunąć aktywną promocję lub poczekać aż wygaśnie.</p>
+                                <p class="mt-1"><strong>Promocja kończy się za:</strong> {{ formatTimeRemaining($product->promotion_expires_at) }}</p>
                             </div>
                         </div>
                     @else
-                        <a href="{{ route('staff.products.edit', $product) }}" class="bg-yellow-400 text-white px-2 py-1 rounded text-sm hover:bg-yellow-500">Edytuj</a>
+                        <a href="{{ generate_promotion_url('staff.products.edit', $product) }}" class="bg-yellow-400 text-white px-2 py-1 rounded text-sm hover:bg-yellow-500">Edytuj</a>
                     @endif
 
                     @if($hasActivePromotion)
-                        <a href="{{ route('staff.products.promotion', $product) }}" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Edytuj promocję</a>
+                        <a href="{{ generate_promotion_url('staff.products.promotion', $product) }}" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Edytuj promocję</a>
                     @else
-                        <a href="{{ route('staff.products.promotion', $product) }}" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Ustal promocję</a>
+                        <a href="{{ generate_promotion_url('staff.products.promotion', $product) }}" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Ustal promocję</a>
                     @endif
                 </td>
             </tr>
