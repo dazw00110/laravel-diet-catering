@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -45,7 +46,6 @@ class ProductController extends Controller
                 ->where('is_vegetarian', false);
         }
 
-        // sortowanie
         if ($request->filled('sort')) {
             $sort = $request->get('sort');
             $dir = $request->get('dir', 'asc');
@@ -70,22 +70,31 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, Product $product)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'calories' => 'required|integer|min:0',
-            'is_vegan' => 'boolean',
-            'is_vegetarian' => 'boolean',
-        ]);
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'price' => 'required|numeric',
+        'calories' => 'nullable|integer',
+        'is_vegan' => 'nullable|boolean',
+        'is_vegetarian' => 'nullable|boolean',
+        'description' => 'nullable|string',
+        'image' => 'nullable|image|max:2048',
+    ]);
 
-        $product->update($validated);
+    if ($request->hasFile('image')) {
+        if ($product->image_path && Storage::disk('public')->exists($product->image_path)) {
+            Storage::disk('public')->delete($product->image_path);
+        }
 
-        $redirectUrl = $this->buildRedirectUrlFromReferer($request);
-
-        return redirect($redirectUrl)->with('success', 'Produkt został zaktualizowany.');
+        $path = $request->file('image')->store('products', 'public');
+        $validated['image_path'] = $path;
     }
+
+    $product->update($validated);
+
+    return redirect()->route('staff.products.index')->with('success', 'Produkt zaktualizowany.');
+}
+
 
     public function promotion(Product $product)
     {
