@@ -54,7 +54,8 @@ public function index(Request $request)
         $query->latest();
     }
 
-    $products = $query->paginate(10)->appends($request->query());
+    $perPage = in_array(request('per_page'), [10, 30, 50]) ? request('per_page') : 10;
+    $products = Product::query()->paginate($perPage)->appends(request()->query());
 
     return view('admin.products.index', compact('products'));
 }

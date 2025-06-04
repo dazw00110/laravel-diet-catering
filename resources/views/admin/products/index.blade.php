@@ -126,6 +126,19 @@
 </table>
 
 <div class="mt-6">
-    {{ $products->links() }}
+    {{ $products->withQueryString()->links() }}
+</div>
+
+<div class="mt-4 flex justify-center items-center gap-4 text-sm">
+    <span class="text-gray-600">Pokaż na stronę:</span>
+    @foreach ([10, 30, 50] as $size)
+        <a href="{{ request()->fullUrlWithQuery(['per_page' => $size]) }}"
+           class="px-3 py-1 rounded border
+                  {{ request('per_page', 10) == $size
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+            {{ $size }}
+        </a>
+    @endforeach
 </div>
 @endsection
