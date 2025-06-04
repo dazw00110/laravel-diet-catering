@@ -81,4 +81,38 @@ class ProductController extends Controller
 
         return redirect()->route('staff.products.index')->with('success', 'Produkt został zaktualizowany.');
     }
+
+    public function promotion(Product $product)
+    {
+        return view('staff.products.promotion', compact('product'));
+    }
+
+    public function storePromotion(Request $request, Product $product)
+    {
+        $request->validate([
+            'promotion_price' => 'required|numeric|min:0.01',
+            'hours' => 'required|integer|min:1|max:48',
+        ]);
+
+        $hours = (int) $request->hours;
+
+        $product->update([
+            'promotion_price' => $request->promotion_price,
+            'promotion_expires_at' => now()->addHours($hours),
+        ]);
+
+        return redirect()->route('staff.products.index')
+            ->with('success', 'Super promocja last minute została ustawiona na najbliższe ' . $hours . ' godzin.');
+    }
+
+    public function removePromotion(Product $product)
+    {
+        $product->update([
+            'promotion_price' => null,
+            'promotion_expires_at' => null,
+        ]);
+
+        return redirect()->route('staff.products.index')
+            ->with('success', 'Promocja została usunięta.');
+    }
 }

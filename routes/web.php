@@ -121,8 +121,10 @@ Route::prefix('staff')
         Route::resource('products', \App\Http\Controllers\Staff\ProductController::class)->only(['index', 'edit', 'update']);
         Route::get('/orders', fn () => view('staff.orders.index'))->name('orders.index');
 
+        Route::get('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'promotion'])->name('products.promotion');
+        Route::post('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'storePromotion'])->name('products.promotion.store');
+        Route::delete('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'removePromotion'])->name('products.promotion.remove');
     });
-
 
 // USER PROFILE
 Route::middleware(['auth', EnsureTotpVerified::class])->group(function () {
