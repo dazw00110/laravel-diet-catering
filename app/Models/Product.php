@@ -19,6 +19,7 @@ class Product extends Model
         'is_vegetarian',
         'promotion_price',
         'promotion_expires_at',
+        'image_path',
     ];
 
     protected $casts = [
