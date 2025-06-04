@@ -13,7 +13,7 @@ class ProductController extends Controller
         $query = Product::query();
 
         if ($request->filled('name')) {
-            $query->where('name', 'like', '%' . $request->name . '%');
+            $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->name) . '%']);
         }
 
         if ($request->filled('min_price')) {
@@ -45,15 +45,18 @@ class ProductController extends Controller
                 ->where('is_vegetarian', false);
         }
 
+        // sortowanie
         if ($request->filled('sort')) {
             $sort = $request->get('sort');
             $dir = $request->get('dir', 'asc');
 
             if (in_array($sort, ['name', 'price', 'calories', 'id'])) {
                 $query->orderBy($sort, $dir);
+            } else {
+                $query->orderByDesc('id');
             }
         } else {
-            $query->latest();
+            $query->orderByDesc('id');
         }
 
         $products = $query->paginate(10)->appends($request->query());
@@ -79,6 +82,81 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('staff.products.index')->with('success', 'Produkt został zaktualizowany.');
+        $redirectUrl = $this->buildRedirectUrlFromReferer($request);
+
+        return redirect($redirectUrl)->with('success', 'Produkt został zaktualizowany.');
+    }
+
+    public function promotion(Product $product)
+    {
+        return view('staff.products.promotion', compact('product'));
+    }
+
+    public function storePromotion(Request $request, Product $product)
+    {
+        $request->validate([
+            'promotion_price' => 'required|numeric|min:0.01',
+            'hours' => 'required|integer|min:1|max:48',
+        ]);
+
+        $hours = (int) $request->hours;
+
+        $product->updateQuietly([
+            'promotion_price' => $request->promotion_price,
+            'promotion_expires_at' => now()->addHours($hours),
+        ]);
+
+        $redirectUrl = $this->buildRedirectUrlFromReferer($request);
+
+        return redirect($redirectUrl)
+            ->with('success', 'Super promocja last minute została ustawiona na najbliższe ' . $hours . ' godzin.');
+    }
+
+    public function removePromotion(Request $request, Product $product)
+    {
+        $product->updateQuietly([
+            'promotion_price' => null,
+            'promotion_expires_at' => null,
+        ]);
+
+        $redirectUrl = $this->buildRedirectUrlFromReferer($request);
+
+        return redirect($redirectUrl)
+            ->with('success', 'Promocja została usunięta.');
+    }
+
+    private function buildRedirectUrlFromReferer(Request $request)
+    {
+        $referer = $request->headers->get('referer');
+
+        if ($referer && str_contains($referer, route('staff.products.index'))) {
+            $parsedUrl = parse_url($referer);
+            if (isset($parsedUrl['query'])) {
+                parse_str($parsedUrl['query'], $queryParams);
+                return route('staff.products.index') . '?' . http_build_query($queryParams);
+            }
+        }
+
+        return $this->buildRedirectUrl($request);
+    }
+
+    private function buildRedirectUrl(Request $request)
+    {
+        $baseUrl = route('staff.products.index');
+        $params = [];
+
+        foreach (['name', 'min_price', 'max_price', 'min_calories', 'max_calories', 'sort', 'dir', 'page'] as $param) {
+            if ($request->filled($param)) {
+                $params[$param] = $request->$param;
+            }
+        }
+
+        foreach (['is_vegan', 'is_vegetarian', 'non_vegan_vegetarian'] as $boolParam) {
+            if ($request->boolean($boolParam)) {
+                $params[$boolParam] = '1';
+            }
+        }
+
+        return $params ? $baseUrl . '?' . http_build_query($params) : $baseUrl;
     }
 }

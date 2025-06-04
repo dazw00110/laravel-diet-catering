@@ -14,6 +14,8 @@ return new class extends Migration {
             $table->decimal('price', 8, 2);
             $table->integer('calories');
             $table->boolean('is_active')->default(true);
+            $table->decimal('promotion_price', 8, 2)->nullable();
+            $table->timestamp('promotion_expires_at')->nullable();
             $table->timestamps();
         });
     }
