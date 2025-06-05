@@ -62,10 +62,12 @@ Route::prefix('admin')
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/users', fn () => 'User list')->name('users.index');
+
+        //CRUD for Users
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except('show');
 
         //CRUD for Products
-    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class)->except('show');
+        Route::resource('products', \App\Http\Controllers\Admin\ProductController::class)->except('show');
 
         // Full CRUD for Orders
 
@@ -133,7 +135,7 @@ Route::middleware(['auth', EnsureTotpVerified::class])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// TESTOWE WIDOKI BŁĘDÓW (tylko w trybie local)
+// ErrorViews (only on local)
 if (app()->environment('local')) {
     // Disable TOTP manually
     Route::post('/2fa/disable', function () {
