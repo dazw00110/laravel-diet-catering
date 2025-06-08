@@ -18,7 +18,7 @@
                 <a href="{{ route('admin.orders.index') }}" class="hover:text-blue-600">Zamówienia</a>
                 <a href="{{ route('admin.products.index') }}" class="hover:text-blue-600">Produkty</a>
                 <a href="{{ route('admin.stats.index') }}" class="hover:text-blue-600">Statystyki</a>
-                <a href="{{ route('profile.edit') }}" class="hover:text-blue-600">Mój profil</a>
+                <a href="{{ route('profile.show') }}" class="hover:text-blue-600">Mój profil</a>
 
                 <form method="POST" action="{{ route('logout') }}" class="flex items-center">
                     @csrf

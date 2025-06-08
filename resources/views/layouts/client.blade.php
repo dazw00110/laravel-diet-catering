@@ -12,7 +12,7 @@
                 <a href="{{ route('client.dashboard') }}" class="hover:text-blue-600">Strona główna</a>
                 <a href="{{ route('client.orders.index') }}" class="hover:text-blue-600">Moje zamówienia</a>
                 <a href="{{ route('client.products.index') }}" class="hover:text-blue-600">Produkty</a>
-                <a href="{{ route('profile.edit') }}" class="hover:text-blue-600">Mój profil</a>
+                <a href="{{ route('profile.show') }}" class="hover:text-blue-600">Mój profil</a>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
