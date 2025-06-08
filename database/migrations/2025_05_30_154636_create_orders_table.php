@@ -11,9 +11,10 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->decimal('total_price', 8, 2);
-            $table->string('status')->default('unordered'); // unordered = koszyk, in_progress, completed, cancelled
+            $table->string('status')->default('unordered'); // unordered = koszyk, in_progress = w realizacji, completed = ukończone, cancelled = przerwane
             $table->date('start_date');
             $table->date('end_date');
+            $table->timestamp('cancelled_at')->nullable()->comment('Data przerwania zamówienia, jeśli anulowane');
             $table->timestamps();
         });
     }

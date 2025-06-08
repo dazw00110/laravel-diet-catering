@@ -52,4 +52,6 @@ class Product extends Model
     {
         return $this->hasActivePromotion() ? $this->promotion_price : $this->price;
     }
+
+
 }

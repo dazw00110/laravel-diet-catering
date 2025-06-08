@@ -34,13 +34,17 @@ class OrderSeeder extends Seeder
                 $endDate = (clone $startDate)->modify("+{$days} days");
 
                 $orderId = DB::table('orders')->insertGetId([
-                    'user_id'     => $userId,
-                    'total_price' => 0,
-                    'status'      => $status,
-                    'start_date'  => $startDate,
-                    'end_date'    => $endDate,
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
+                    'user_id'           => $userId,
+                    'total_price'       => 0,
+                    'status'            => $status,
+                    'start_date'        => $startDate,
+                    'end_date'          => $endDate,
+                    'city'              => $faker->city,
+                    'postal_code'       => $faker->postcode,
+                    'street'            => $faker->streetName,
+                    'apartment_number'  => $faker->buildingNumber,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
                 ]);
 
                 $total = 0;

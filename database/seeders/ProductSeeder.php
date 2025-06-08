@@ -14,14 +14,15 @@ class ProductSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $defaultImagePath = 'products/default.png';
-        $localDefaultImage = base_path('resources/defaults/products/default.png');
+        $defaultImagePath = 'products/default.png'; // docelowa ścieżka w storage/app/public
+        $localDefaultImage = base_path('resources/defaults/products/default-product.png');
 
+        // 🛡️ Bezpieczne kopiowanie domyślnego obrazka
         if (!Storage::disk('public')->exists($defaultImagePath)) {
             if (File::exists($localDefaultImage)) {
                 Storage::disk('public')->put($defaultImagePath, File::get($localDefaultImage));
             } else {
-                echo "⚠️  Brakuje pliku: $localDefaultImage. Upewnij się, że go dodałeś.";
+                echo "⚠️  Brakuje pliku: $localDefaultImage. Pomijam kopiowanie.\n";
             }
         }
 
