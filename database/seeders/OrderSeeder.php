@@ -18,6 +18,7 @@ class OrderSeeder extends Seeder
             })->pluck('id');
 
         $products = DB::table('products')->get();
+        $discounts = DB::table('discounts')->pluck('code');
 
         $statuses = [
             'completed' => 25,
@@ -43,6 +44,7 @@ class OrderSeeder extends Seeder
                     'postal_code'       => $faker->postcode,
                     'street'            => $faker->streetName,
                     'apartment_number'  => $faker->buildingNumber,
+                    'discount_code'     => $faker->optional(0.3)->randomElement($discounts),
                     'created_at'        => now(),
                     'updated_at'        => now(),
                 ]);

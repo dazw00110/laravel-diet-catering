@@ -12,22 +12,36 @@
         </form>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <a href="{{ route('staff.orders.index') }}" class="bg-white p-6 rounded-xl shadow hover:bg-gray-100 transition">
-            <h2 class="text-lg font-semibold mb-2">Zamówienia</h2>
-            <p class="text-sm text-gray-600">Zarządzaj realizowanymi zamówieniami.</p>
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-gray-800">👨‍🍳 Witaj w panelu pracownika</h1>
+        <p class="text-gray-600 mt-2">Zarządzaj zamówieniami, analizuj sprzedaż i edytuj oferty cateringowe</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="{{ route('staff.orders.index') }}" class="group bg-gradient-to-tr from-blue-100 to-blue-200 p-6 rounded-2xl shadow hover:scale-105 transition duration-200">
+            <div class="text-4xl mb-3">📦</div>
+            <h2 class="text-lg font-semibold text-gray-800 group-hover:underline">Zamówienia</h2>
+            <p class="text-sm text-gray-700">Zarządzaj realizowanymi zamówieniami klientów.</p>
         </a>
-        <a href="{{ route('staff.stats.index') }}" class="bg-white p-6 rounded-xl shadow hover:bg-gray-100 transition">
-            <h2 class="text-lg font-semibold mb-2">Statystyki</h2>
-            <p class="text-sm text-gray-600">Analizuj dane sprzedaży i cateringu.</p>
+
+        <a href="{{ route('staff.products.index') }}" class="group bg-gradient-to-tr from-green-100 to-green-200 p-6 rounded-2xl shadow hover:scale-105 transition duration-200">
+            <div class="text-4xl mb-3">🍱</div>
+            <h2 class="text-lg font-semibold text-gray-800 group-hover:underline">Produkty</h2>
+            <p class="text-sm text-gray-700">Aktualizuj dostępne oferty cateringowe.</p>
         </a>
-        <a href="{{ route('staff.products.index') }}" class="bg-white p-6 rounded-xl shadow hover:bg-gray-100 transition">
-            <h2 class="text-lg font-semibold mb-2">Produkty</h2>
-            <p class="text-sm text-gray-600">Aktualizuj dostępne oferty.</p>
+
+        <a href="{{ route('staff.stats.index') }}" class="group bg-gradient-to-tr from-purple-100 to-purple-200 p-6 rounded-2xl shadow hover:scale-105 transition duration-200">
+            <div class="text-4xl mb-3">📊</div>
+            <h2 class="text-lg font-semibold text-gray-800 group-hover:underline">Statystyki</h2>
+            <p class="text-sm text-gray-700">Analizuj dane sprzedaży i wyniki cateringu.</p>
         </a>
-        <a href="{{ route('profile.edit') }}" class="bg-white p-6 rounded-xl shadow hover:bg-gray-100 transition">
-            <h2 class="text-lg font-semibold mb-2">Mój profil</h2>
-            <p class="text-sm text-gray-600">Zarządzaj swoim kontem.</p>
+
+
+
+        <a href="{{ route('profile.edit') }}" class="group bg-gradient-to-tr from-yellow-100 to-yellow-200 p-6 rounded-2xl shadow hover:scale-105 transition duration-200">
+            <div class="text-4xl mb-3">👤</div>
+            <h2 class="text-lg font-semibold text-gray-800 group-hover:underline">Mój profil</h2>
+            <p class="text-sm text-gray-700">Zarządzaj swoim kontem i ustawieniami.</p>
         </a>
     </div>
 @endsection
