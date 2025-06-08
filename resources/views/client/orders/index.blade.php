@@ -92,13 +92,21 @@
                 @endif
 
                 <div class="flex gap-4 mt-3">
-                    <form method="POST" action="{{ route('client.cart.repeatOrder', $order) }}">
-                        @csrf
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
-                            Zamów ponownie
-                        </button>
-                    </form>
-                </div>
+    <form method="POST" action="{{ route('client.cart.repeatOrder', $order) }}">
+        @csrf
+        <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
+            Zamów ponownie
+        </button>
+    </form>
+
+    @if (!$order->hasReviews())
+    <a href="{{ route('client.orders.reviews.create', $order) }}" class="bg-yellow-500 text-white px-4 py-1 rounded hover:bg-yellow-600">
+        Wystaw opinię
+    </a>
+@else
+    <span class="text-green-600 font-medium">✔️ Opinia wystawiona</span>
+@endif
+</div>
             </div>
         @empty
             <p class="text-gray-500">Brak ukończonych zamówień.</p>

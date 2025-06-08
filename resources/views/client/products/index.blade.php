@@ -122,7 +122,8 @@
                                             @forelse ($product->reviews as $review)
                                                 <div class="border-b border-gray-200 pb-3 mb-3 last:border-none last:mb-0">
                                                     <p class="font-semibold text-sm">
-                                                        {{ $review->user ? $review->user->name : 'Anonim' }}
+{{ $review->user ? $review->user->first_name . ' ' . $review->user->last_name : 'Anonim' }}
+
                                                     </p>
                                                     <p class="text-yellow-500 text-sm mb-1">
                                                         @for ($i = 0; $i < 5; $i++)

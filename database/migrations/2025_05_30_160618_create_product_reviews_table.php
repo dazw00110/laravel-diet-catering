@@ -8,13 +8,14 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('product_reviews', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('products');
-            $table->tinyInteger('rating');
-            $table->text('comment')->nullable();
-            $table->timestamps();
-        });
+        $table->id();
+        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+        $table->foreignId('product_id')->constrained('products');
+        $table->foreignId('order_id')->nullable()->constrained('orders')->onDelete('cascade'); // <-- DODANE
+        $table->tinyInteger('rating');
+        $table->text('comment')->nullable();
+        $table->timestamps();
+    });
     }
 
     public function down(): void

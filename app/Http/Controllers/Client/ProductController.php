@@ -59,8 +59,6 @@ class ProductController extends Controller
 
         $products = $query->paginate($perPage)->withQueryString();
 
-
-
         return view('client.products.index', compact('products'));
     }
 }
