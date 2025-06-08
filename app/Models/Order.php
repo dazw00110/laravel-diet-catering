@@ -10,12 +10,23 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'status',
-        'start_date',
-        'end_date',
-        'total_price',
-        'discount_code',
+    'user_id',
+    'status',
+    'start_date',
+    'end_date',
+    'total_price',
+    'discount_code',
+    'city',
+    'postal_code',
+    'street',
+    'apartment_number',
+    ];
+
+
+ protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     public function user()
@@ -44,7 +55,12 @@ class Order extends Model
     {
         return self::firstOrCreate(
             ['user_id' => $userId, 'status' => 'unordered'],
-            ['total_price' => 0, 'start_date' => now(), 'end_date' => now()]
+            [
+                'total_price' => 0,
+                'start_date' => now()->startOfDay(),
+                'end_date' => now()->startOfDay()->addDays(6), // 7-dniowy okres
+            ]
         );
     }
+
 }

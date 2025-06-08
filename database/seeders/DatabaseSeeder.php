@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         DiscountSeeder::class,
         CancellationSeeder::class,
         ProductReviewSeeder::class,
+
 ]);
 
     }

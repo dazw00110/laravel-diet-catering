@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
-
 class ProductReviewSeeder extends Seeder
 {
     public function run(): void
@@ -18,13 +17,13 @@ class ProductReviewSeeder extends Seeder
 
         $products = DB::table('products')->pluck('id');
 
-        foreach (range(1, 20) as $i) {
+        foreach (range(1, 500) as $i) {
             DB::table('product_reviews')->insert([
                 'user_id' => $clients->random(),
                 'product_id' => $products->random(),
                 'rating' => rand(1, 5),
-                'comment' => $faker->optional()->sentence(),
-                'created_at' => now(),
+                'comment' => $faker->optional()->realText(60),
+                'created_at' => now()->subDays(rand(0, 100)),
                 'updated_at' => now(),
             ]);
         }

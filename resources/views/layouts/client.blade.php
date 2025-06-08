@@ -2,28 +2,52 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Panel klienta - @yield('title', 'Dashboard')</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CateringApp – @yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
-<body class="bg-gray-100 text-gray-900 min-h-screen">
-    <nav class="bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex gap-4 text-sm font-medium">
-                <a href="{{ route('client.dashboard') }}" class="hover:text-blue-600">Strona główna</a>
-                <a href="{{ route('client.orders.index') }}" class="hover:text-blue-600">Moje zamówienia</a>
-                <a href="{{ route('client.products.index') }}" class="hover:text-blue-600">Produkty</a>
-                <a href="{{ route('profile.show') }}" class="hover:text-blue-600">Mój profil</a>
-            </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button class="text-red-500 hover:underline text-sm">Wyloguj</button>
-            </form>
-        </div>
-    </nav>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col pt-[70px]">
 
-    <main class="max-w-7xl mx-auto py-8 px-4">
-        <h1 class="text-2xl font-bold mb-6">@yield('title')</h1>
+    <!-- 🔝 STICKY NAVBAR -->
+    <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center w-full">
+            @php
+                $dashboardRoute = match(auth()->user()?->user_type_id) {
+                    1 => route('admin.dashboard'),
+                    2 => route('client.dashboard'),
+                    3 => route('staff.dashboard'),
+                    default => '#'
+                };
+            @endphp
+
+            <a href="{{ $dashboardRoute }}" class="text-xl font-bold text-gray-800 hover:text-blue-600">
+                🍰 CateringApp
+            </a>
+
+            <nav class="ml-auto space-x-4 text-sm md:text-base">
+                <a href="{{ route('client.dashboard') }}" class="hover:text-green-600">Strona główna</a>
+                <a href="{{ route('client.products.index') }}" class="hover:text-green-600">Oferty</a>
+                <a href="{{ route('client.contact') }}" class="hover:text-green-600">Kontakt</a>
+                <a href="{{ route('client.orders.index') }}" class="hover:text-green-600">Moje zamówienia</a>
+                <a href="{{ route('client.profile') }}" class="hover:text-green-600">Moje konto</a>
+                <a href="{{ route('client.cart.index') }}" class="hover:text-green-600">Koszyk</a>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="hover:text-red-600">Wyloguj</button>
+                </form>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 🔽 MAIN CONTENT -->
+    <main class="flex-grow">
         @yield('content')
     </main>
+
+    <!-- 🔚 FOOTER -->
+    <footer class="bg-white border-t mt-10 text-center py-4 text-sm text-gray-500">
+        &copy; {{ date('Y') }} CateringApp. Wszelkie prawa zastrzeżone.
+    </footer>
 </body>
 </html>

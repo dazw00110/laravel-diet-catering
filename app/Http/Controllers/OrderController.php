@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\Discount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -26,10 +31,32 @@ class OrderController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'status' => 'required|string',
+            'discount_code' => 'nullable|string',
         ]);
 
-        Order::create($validated);
-        return redirect()->route('orders.index')->with('success', 'Zamówienie dodane.');
+        DB::beginTransaction();
+        try {
+            $order = Order::create($validated);
+
+            // Obsługa przypisanego kodu rabatowego
+            if ($request->filled('discount_code')) {
+                $code = strtolower($request->discount_code);
+                $discount = Discount::whereRaw('LOWER(code) = ?', [$code])
+                    ->whereHas('users', fn($q) => $q->where('user_id', $request->user_id))
+                    ->first();
+
+                if ($discount) {
+                    $discount->users()->detach($request->user_id);
+                    $discount->delete();
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('orders.index')->with('success', 'Zamówienie dodane.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Błąd przy dodawaniu zamówienia.'])->withInput();
+        }
     }
 
     public function update(Request $request, Order $order)
@@ -41,8 +68,27 @@ class OrderController extends Controller
             'total_price' => 'required|numeric',
         ]);
 
-        $order->update($validated);
-        return redirect()->route('orders.index')->with('success', 'Zamówienie zaktualizowane.');
+        DB::beginTransaction();
+        try {
+            $order->update($validated);
+
+            if ($order->discount_code) {
+                $discount = Discount::where('code', $order->discount_code)
+                    ->whereHas('users', fn($q) => $q->where('user_id', $order->user_id))
+                    ->first();
+
+                if ($discount) {
+                    $discount->users()->detach($order->user_id);
+                    $discount->delete();
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('orders.index')->with('success', 'Zamówienie zaktualizowane.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Błąd przy aktualizacji zamówienia.'])->withInput();
+        }
     }
 
     public function destroy(Order $order)

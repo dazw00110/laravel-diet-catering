@@ -24,7 +24,7 @@ class User extends Authenticatable
         'totp_secret', // TOTP
     ];
 
-    protected $hidden = ['password', 'remember_token', 'totp_secret']; // hide TOTP from JSON serialization
+    protected $hidden = ['password', 'remember_token', 'totp_secret'];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -46,5 +46,10 @@ class User extends Authenticatable
     public function productReviews()
     {
         return $this->hasMany(ProductReview::class);
+    }
+
+    public function discounts()
+    {
+        return $this->belongsToMany(Discount::class, 'discount_user');
     }
 }
