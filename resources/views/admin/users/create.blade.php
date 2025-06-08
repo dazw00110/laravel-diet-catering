@@ -1,8 +1,9 @@
 @extends('layouts.admin')
 
+@section('title', 'Dodaj nowego użytkownika')
+
 @section('content')
 <div class="p-6">
-    <h1 class="text-2xl font-semibold mb-4">Stwórz nowego użytkownika</h1>
 
     <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-4">
         @csrf

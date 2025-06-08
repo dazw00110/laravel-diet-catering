@@ -115,6 +115,9 @@ Route::prefix('staff')
         Route::get('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'promotion'])->name('products.promotion');
         Route::post('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'storePromotion'])->name('products.promotion.store');
         Route::delete('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'removePromotion'])->name('products.promotion.remove');
+
+        Route::resource('users', \App\Http\Controllers\Staff\UserController::class)
+            ->except(['destroy', 'show']);
     });
 
 
