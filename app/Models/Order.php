@@ -62,5 +62,17 @@ class Order extends Model
             ]
         );
     }
+    public function reviews()
+{
+    return $this->hasMany(\App\Models\ProductReview::class, 'order_id');
+}
+    public function hasReviews(): bool
+{
+    return $this->reviews()->exists();
+}
+public function productReviews()
+{
+    return $this->hasManyThrough(ProductReview::class, OrderItem::class, 'order_id', 'product_id', 'id', 'product_id');
+}
 
 }

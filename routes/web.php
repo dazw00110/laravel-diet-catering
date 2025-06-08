@@ -21,6 +21,8 @@ use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Client\ClientOrderController;
+use App\Http\Controllers\Client\ProductReviewController;
+
 
 // Home Page
 Route::get('/', fn () => view('welcome'))->name('home');
@@ -128,6 +130,9 @@ Route::prefix('client')
 
         Route::get('/contact', fn () => view('client.contact'))->name('contact');
         Route::get('/account', fn () => view('client.profile'))->name('profile');
+
+        Route::get('/orders/{order}/reviews/create', [ProductReviewController::class, 'create'])->name('orders.reviews.create');
+Route::post('/orders/{order}/reviews', [ProductReviewController::class, 'store'])->name('orders.reviews.store');
     });
 
 
