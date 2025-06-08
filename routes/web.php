@@ -84,17 +84,36 @@ Route::prefix('admin')
 
 // STAFF PANEL
 Route::prefix('staff')
-    ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':3'])
+    ->middleware(['auth', EnsureTotpVerified::class, RoleMiddleware::class . ':3']) // Only staff (role = 3)
     ->name('staff.')
     ->group(function () {
+
+        //Complete an order manually (custom route)
+        Route::post('/orders/{order}/complete', [\App\Http\Controllers\Staff\OrderController::class, 'complete'])->name('orders.complete');
+
+
+        // 🔧 Cancel an order manually (custom route)
+        Route::post('/orders/{order}/cancel', [\App\Http\Controllers\Staff\OrderController::class, 'cancel'])->name('orders.cancel');
+
+        // 📊 Staff dashboard view
         Route::get('/dashboard', [\App\Http\Controllers\Staff\DashboardController::class, 'index'])->name('dashboard');
+
+        // 📈 Staff sales statistics with charts and calculations
         Route::get('/stats', [\App\Http\Controllers\Staff\StatsController::class, 'index'])->name('stats.index');
+
+        // 🛒 Product management for staff (only: index, edit, update)
         Route::resource('products', \App\Http\Controllers\Staff\ProductController::class)->only(['index', 'edit', 'update']);
-        Route::get('/orders', fn () => view('staff.orders.index'))->name('orders.index');
+
+        // 📦 Full CRUD for orders (create, view, edit, update, delete)
+        Route::resource('orders', \App\Http\Controllers\Staff\OrderController::class);
+
+        // ⚡ Last-minute promotion routes
         Route::get('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'promotion'])->name('products.promotion');
         Route::post('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'storePromotion'])->name('products.promotion.store');
         Route::delete('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'removePromotion'])->name('products.promotion.remove');
     });
+
+
 
 // USER PROFILE
 Route::middleware(['auth', EnsureTotpVerified::class])->group(function () {
