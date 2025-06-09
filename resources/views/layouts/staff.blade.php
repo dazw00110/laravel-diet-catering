@@ -23,7 +23,7 @@
             </a>
 
             <div class="flex items-center gap-4 text-sm font-medium ml-auto">
-                {{-- <a href="{{ route('staff.users.index') }}">Użytkownicy</a> --}}
+                <a href="{{ route('staff.users.index') }}" class="hover:text-blue-600">Użytkownicy</a>
                 <a href="{{ route('staff.orders.index') }}" class="hover:text-blue-600">Zamówienia</a>
                 <a href="{{ route('staff.products.index') }}" class="hover:text-blue-600">Produkty</a>
                 <a href="{{ route('staff.stats.index') }}" class="hover:text-blue-600">Statystyki</a>
