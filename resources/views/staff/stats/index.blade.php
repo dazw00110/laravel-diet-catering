@@ -31,10 +31,18 @@
     <div x-data="{ loading: false }" class="bg-gray-100 p-4 rounded">
         <form @change="loading = true; $event.target.form.submit()" method="GET">
             <div class="flex flex-col md:flex-row gap-4 items-center">
-                <label>
-                    📅 Miesiąc:
-                    <input type="month" name="month" value="{{ request('month', now()->format('Y-m')) }}" class="input input-bordered" />
-                </label>
+            <label>
+                📅 Miesiąc:
+                <input
+                    type="month"
+                    name="month"
+                    value="{{ request('month', now()->format('Y-m')) }}"
+                    min="2000-01"
+                    max="{{ now()->format('Y-m') }}"
+                    class="input input-bordered"
+                />
+            </label>
+
                 <label>
                     📌 Status:
                     <select name="status" class="input input-bordered">

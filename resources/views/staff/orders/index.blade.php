@@ -21,14 +21,31 @@
         </div>
 
         <div>
-            <label class="block text-sm mb-1">Data początkowa (od min)</label>
-            <input type="date" name="start_from" value="{{ request('start_from') }}" class="input input-bordered w-full">
+            <label for="start_from" class="block text-sm mb-1">Data początkowa (od min)</label>
+            <input
+                type="date"
+                id="start_from"
+                name="start_from"
+                value="{{ request('start_from') }}"
+                class="input input-bordered w-full"
+                min="2000-01-01"
+                max="{{ now()->toDateString() }}"
+            >
         </div>
 
         <div>
-            <label class="block text-sm mb-1">Data końcowa (do max)</label>
-            <input type="date" name="end_to" value="{{ request('end_to') }}" class="input input-bordered w-full">
+            <label for="end_to" class="block text-sm mb-1">Data końcowa (do max)</label>
+            <input
+                type="date"
+                id="end_to"
+                name="end_to"
+                value="{{ request('end_to') }}"
+                class="input input-bordered w-full"
+                min="2000-01-01"
+                max="{{ now()->addYear()->toDateString() }}"
+            >
         </div>
+
 
         <div>
             <label class="block text-sm mb-1">Status</label>

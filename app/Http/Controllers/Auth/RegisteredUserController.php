@@ -30,7 +30,12 @@ class RegisteredUserController extends Controller
             'first_name' => ['required', 'string', 'max:255', 'regex:/^[\pL\s\'\-]+$/u'],
             'last_name' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\'\-]+$/u'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email', 'regex:/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/'],
-            'birth_date' => ['required', 'date', 'before_or_equal:today'],
+            'birth_date' => [
+                'required',
+                'date',
+                'after_or_equal:' . now()->subYears(150)->toDateString(),
+                'before_or_equal:' . now()->subYears(14)->toDateString(),
+            ],
             'password' => [
                 'required',
                 'confirmed',
