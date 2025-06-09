@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
         CancellationSeeder::class,
         ProductReviewSeeder::class,
 
+        // Do testów usuwania kaskadowego
+        TestCascadeDeleteSeeder::class,
+
 ]);
 
     }

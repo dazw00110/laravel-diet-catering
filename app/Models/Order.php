@@ -4,30 +4,36 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-    'user_id',
-    'status',
-    'start_date',
-    'end_date',
-    'total_price',
-    'discount_code',
-    'city',
-    'postal_code',
-    'street',
-    'apartment_number',
+        'user_id',
+        'status',
+        'start_date',
+        'end_date',
+        'total_price',
+        'discount_code',
+        'city',
+        'postal_code',
+        'street',
+        'apartment_number',
     ];
 
-
- protected $casts = [
+    protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'cancelled_at' => 'datetime',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
 
     public function user()
     {
@@ -44,13 +50,28 @@ class Order extends Model
         return $this->hasOne(Cancellation::class);
     }
 
-    // get unordered orders
+    public function reviews()
+    {
+        return $this->hasMany(\App\Models\ProductReview::class, 'order_id');
+    }
+
+    public function productReviews()
+    {
+        return $this->hasManyThrough(
+            ProductReview::class,
+            OrderItem::class,
+            'order_id',
+            'product_id',
+            'id',
+            'product_id'
+        );
+    }
+
     public function scopeUnordered($query)
     {
         return $query->where('status', 'unordered');
     }
 
-    // get or create a cart for a user
     public static function getOrCreateCartForUser($userId)
     {
         return self::firstOrCreate(
@@ -58,31 +79,18 @@ class Order extends Model
             [
                 'total_price' => 0,
                 'start_date' => now()->startOfDay(),
-                'end_date' => now()->startOfDay()->addDays(6), // 7-dniowy okres
+                'end_date' => now()->startOfDay()->addDays(6),
             ]
         );
     }
-    public function reviews()
-{
-    return $this->hasMany(\App\Models\ProductReview::class, 'order_id');
-}
+
     public function hasReviews(): bool
     {
         foreach ($this->items as $item) {
-            $hasReview = $item->product->reviews()
-                ->where('user_id', $this->user_id)
-                ->exists();
-
-            if (!$hasReview) {
+            if (!$item->product->reviews()->where('user_id', $this->user_id)->exists()) {
                 return false;
             }
         }
         return true;
     }
-
-public function productReviews()
-{
-    return $this->hasManyThrough(ProductReview::class, OrderItem::class, 'order_id', 'product_id', 'id', 'product_id');
-}
-
 }
