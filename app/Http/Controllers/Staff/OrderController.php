@@ -112,7 +112,6 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // ✅ Zapis adresu do bazy
             $order = Order::create([
                 'user_id' => $request->user_id,
                 'status' => $request->status,

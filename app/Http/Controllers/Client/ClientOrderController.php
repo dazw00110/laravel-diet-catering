@@ -24,8 +24,25 @@ class ClientOrderController extends Controller
             ->whereIn('status', ['completed', 'cancelled'])
             ->get();
 
+        foreach ($activeOrders as $order) {
+            foreach ($order->items as $item) {
+                $item->has_review = \App\Models\ProductReview::where('user_id', $user->id)
+                    ->where('product_id', $item->product_id)
+                    ->exists();
+            }
+        }
+
+        foreach ($completedOrders as $order) {
+            foreach ($order->items as $item) {
+                $item->has_review = \App\Models\ProductReview::where('user_id', $user->id)
+                    ->where('product_id', $item->product_id)
+                    ->exists();
+            }
+        }
+
         return view('client.orders.index', compact('activeOrders', 'completedOrders'));
     }
+
 
     public function cancel(Order $order)
     {

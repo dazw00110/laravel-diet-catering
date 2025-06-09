@@ -50,12 +50,14 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders'));
     }
 
-    public function create()
-    {
-        $clients = User::whereHas('userType', fn($q) => $q->where('name', 'client'))->get();
-        $products = Product::where('is_active', true)->get();
-        return view('admin.orders.create', compact('clients', 'products'));
-    }
+  public function create()
+{
+    $clients = User::whereHas('userType', fn($q) => $q->where('name', 'client'))->get();
+    $products = Product::where('is_active', true)->get();
+    $allDiscounts = Discount::with('users')->get();
+    return view('admin.orders.create', compact('clients', 'products', 'allDiscounts'));
+}
+
 
     public function show(Order $order)
     {
@@ -82,6 +84,10 @@ class OrderController extends Controller
             'status' => 'required|in:unordered,in_progress,completed,cancelled',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
+            'city' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:20',
+            'street' => 'required|string|max:255',
+            'apartment_number' => 'nullable|string|max:50',
             'items' => 'required|array|max:10',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1|max:10',
@@ -100,6 +106,10 @@ class OrderController extends Controller
                 'status' => $request->status,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
+                'city' => $request->city,
+                'postal_code' => $request->postal_code,
+                'street' => $request->street,
+                'apartment_number' => $request->apartment_number,
                 'total_price' => 0,
             ]);
 
@@ -109,12 +119,14 @@ class OrderController extends Controller
             foreach ($request->items as $item) {
                 $product = Product::findOrFail($item['product_id']);
                 $subtotal = $product->price * $item['quantity'] * $days;
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'quantity' => $item['quantity'],
                     'unit_price' => $product->price,
                 ]);
+
                 $totalPrice += $subtotal;
             }
 
@@ -146,8 +158,18 @@ class OrderController extends Controller
                 }
             }
 
-            if ($totalQty >= 4) {
-                $totalPrice -= $product->price * $days;
+            $productCounts = [];
+            foreach ($request->items as $item) {
+                $productCounts[$item['product_id']] = ($productCounts[$item['product_id']] ?? 0) + $item['quantity'];
+            }
+
+            foreach ($productCounts as $productId => $qty) {
+                if ($qty >= 5) {
+                    $product = Product::find($productId);
+                    if ($product) {
+                        $totalPrice -= $product->price * $days;
+                    }
+                }
             }
 
             if ($totalPrice >= 2000) $totalPrice *= 0.9;
@@ -179,12 +201,17 @@ class OrderController extends Controller
         }
     }
 
-    public function update(Request $request, Order $order)
+
+  public function update(Request $request, Order $order)
     {
         $request->validate([
             'status' => 'required|in:unordered,in_progress,completed,cancelled',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
+            'city' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:20',
+            'street' => 'required|string|max:255',
+            'apartment_number' => 'nullable|string|max:50',
             'items' => 'required|array|max:10',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1|max:10',
@@ -201,6 +228,10 @@ class OrderController extends Controller
                 'status' => $request->status,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
+                'city' => $request->city,
+                'postal_code' => $request->postal_code,
+                'street' => $request->street,
+                'apartment_number' => $request->apartment_number,
             ]);
 
             $order->items()->delete();
@@ -210,12 +241,14 @@ class OrderController extends Controller
             foreach ($request->items as $item) {
                 $product = Product::findOrFail($item['product_id']);
                 $subtotal = $product->price * $item['quantity'] * $days;
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'quantity' => $item['quantity'],
                     'unit_price' => $product->price,
                 ]);
+
                 $totalPrice += $subtotal;
             }
 
@@ -231,14 +264,30 @@ class OrderController extends Controller
                     'type' => $discount->type,
                     'expires_at' => $discount->expires_at,
                 ]);
+
                 $discount->users()->detach($order->user_id);
                 $discount->delete();
+
                 $order->discount_code = $newDiscountCode;
             }
 
-            if ($totalQty >= 4) $totalPrice -= $product->price * $days;
-            if ($totalPrice >= 2000) $totalPrice *= 0.9;
-            if ($totalPrice > 3000) $totalPrice *= 0.85;
+            // 4+1 gratis na poziomie produktu
+            $productCounts = [];
+            foreach ($request->items as $item) {
+                $productCounts[$item['product_id']] = ($productCounts[$item['product_id']] ?? 0) + $item['quantity'];
+            }
+
+            foreach ($productCounts as $productId => $qty) {
+                if ($qty >= 5) {
+                    $product = Product::find($productId);
+                    if ($product) {
+                        $totalPrice -= $product->price * $days;
+                    }
+                }
+            }
+
+            if ($totalPrice >= 3000) $totalPrice *= 0.85;
+            elseif ($totalPrice >= 2000) $totalPrice *= 0.90;
 
             $recentOrders = Order::where('user_id', $order->user_id)
                 ->where('id', '!=', $order->id)
@@ -281,4 +330,14 @@ class OrderController extends Controller
         }
         return redirect()->route('admin.orders.index')->with('success', 'Zamówienie anulowane.');
     }
+
+    public function complete(Order $order)
+    {
+        if ($order->status !== 'completed') {
+            $order->update(['status' => 'completed']);
+        }
+
+        return redirect()->route('admin.orders.index')->with('success', 'Zamówienie oznaczone jako zakończone.');
+    }
+
 }

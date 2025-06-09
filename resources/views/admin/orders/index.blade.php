@@ -1,4 +1,3 @@
-
 @extends('layouts.admin')
 
 @section('title', 'Lista zamówień')
@@ -10,27 +9,22 @@
             <label class="block text-sm mb-1">Klient</label>
             <input type="text" name="client" value="{{ request('client') }}" placeholder="Klient" class="input input-bordered w-full">
         </div>
-
         <div>
             <label class="block text-sm mb-1">Cena od</label>
             <input type="number" min="0" step="0.01" name="min_price" value="{{ request('min_price') }}" placeholder="Cena od" class="input input-bordered w-full">
         </div>
-
         <div>
             <label class="block text-sm mb-1">Cena do</label>
             <input type="number" min="0" step="0.01" name="max_price" value="{{ request('max_price') }}" placeholder="Cena do" class="input input-bordered w-full">
         </div>
-
         <div>
-            <label class="block text-sm mb-1">Data początkowa (od min)</label>
+            <label class="block text-sm mb-1">Data początkowa (od)</label>
             <input type="date" name="start_from" value="{{ request('start_from') }}" class="input input-bordered w-full">
         </div>
-
         <div>
-            <label class="block text-sm mb-1">Data końcowa (do max)</label>
+            <label class="block text-sm mb-1">Data końcowa (do)</label>
             <input type="date" name="end_to" value="{{ request('end_to') }}" class="input input-bordered w-full">
         </div>
-
         <div>
             <label class="block text-sm mb-1">Status</label>
             <select name="status" class="input input-bordered w-full">
@@ -41,7 +35,6 @@
                 <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Anulowano</option>
             </select>
         </div>
-
         <div class="col-span-full flex gap-2 mt-2">
             <button type="submit" class="bg-blue-600 text-white rounded px-4 py-2">Filtruj</button>
             <a href="{{ route('admin.orders.index') }}" class="bg-gray-300 text-black rounded px-4 py-2">Resetuj</a>
@@ -56,32 +49,13 @@
 <table class="min-w-full bg-white shadow rounded">
     <thead>
         <tr>
-            @php
-                $sort = request('sort');
-                $dir = request('dir') === 'desc' ? 'asc' : 'desc';
-
-                function generate_sort_url($field) {
-                    $currentSort = request('sort');
-                    $currentDir = request('dir') === 'desc' ? 'desc' : 'asc';
-                    $nextDir = ($currentSort === $field && $currentDir === 'asc') ? 'desc' : 'asc';
-                    return request()->fullUrlWithQuery(['sort' => $field, 'dir' => $nextDir]);
-                }
-
-                function sort_icon($field) {
-                    $currentSort = request('sort');
-                    $currentDir = request('dir') === 'desc' ? 'desc' : 'asc';
-                    if ($currentSort === $field) {
-                        return $currentDir === 'desc' ? '↓' : '↑';
-                    }
-                    return '';
-                }
-            @endphp
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('id') }}" class="hover:underline">ID {{ sort_icon('id') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('client') }}" class="hover:underline">Klient {{ sort_icon('client') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('total_price') }}" class="hover:underline">Cena {{ sort_icon('total_price') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('status') }}" class="hover:underline">Status {{ sort_icon('status') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('start_date') }}" class="hover:underline">Start {{ sort_icon('start_date') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('end_date') }}" class="hover:underline">Koniec {{ sort_icon('end_date') }}</a></th>
+            <th class="p-2 border-b text-center">ID</th>
+            <th class="p-2 border-b text-center">Klient</th>
+            <th class="p-2 border-b text-center">Cena</th>
+            <th class="p-2 border-b text-center">Status</th>
+            <th class="p-2 border-b text-center">Początek</th>
+            <th class="p-2 border-b text-center">Koniec</th>
+            <th class="p-2 border-b text-center">Lokalizacja</th>
             <th class="p-2 border-b text-center">Akcje</th>
         </tr>
     </thead>
@@ -95,51 +69,55 @@
                     'cancelled' => ['Anulowano', 'bg-red-100 text-red-800'],
                 ];
                 [$label, $class] = $labels[$order->status] ?? [$order->status, 'bg-gray-100 text-gray-800'];
+
+                $city = $order->city ?? '';
+                $street = $order->street ?? '';
+                $apartment = $order->apartment_number ?? '';
+                $location = trim("{$city}, {$street} {$apartment}");
+                if (empty(trim($location, ', '))) $location = 'Brak';
             @endphp
             <tr>
                 <td class="p-2 border-b text-center">{{ $order->id }}</td>
                 <td class="p-2 border-b text-center">{{ $order->user->first_name }} {{ $order->user->last_name }}</td>
                 <td class="p-2 border-b text-center">{{ number_format($order->total_price, 2) }} zł</td>
-                <td class="p-2 border-b text-center">
-                    <span class="px-2 py-1 rounded text-sm font-medium {{ $class }}">{{ $label }}</span>
-                </td>
-                <td class="p-2 border-b text-center">{{ $order->start_date }}</td>
-                <td class="p-2 border-b text-center">{{ $order->end_date }}</td>
+                <td class="p-2 border-b text-center"><span class="px-2 py-1 rounded text-sm font-medium {{ $class }}">{{ $label }}</span></td>
+                <td class="p-2 border-b text-center">{{ \Carbon\Carbon::parse($order->start_date)->format('Y-m-d') }}</td>
+                <td class="p-2 border-b text-center">{{ \Carbon\Carbon::parse($order->end_date)->format('Y-m-d') }}</td>
+                <td class="p-2 border-b text-center">{{ $location }}</td>
                 <td class="p-2 border-b text-center space-y-1 space-x-1">
                     <a href="{{ route('admin.orders.show', $order) }}" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Pokaż</a>
                     <a href="{{ route('admin.orders.edit', $order) }}" class="bg-yellow-400 text-white px-2 py-1 rounded text-sm hover:bg-yellow-500">Edytuj</a>
-                    <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="inline">
-    @csrf @method('DELETE')
-    <button onclick="return confirm('Na pewno?')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Usuń</button>
-</form>
-
-@php
-    $canCancel = $order->status === 'in_progress';
-@endphp
-
-<form action="{{ route('admin.orders.cancel', $order) }}" method="POST" class="inline">
-    @csrf
-    <button
-        @if ($order->status === 'in_progress')
-            onclick="return confirm('Czy na pewno anulować to zamówienie?')"
-            class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-sm"
-        @else
-            disabled
-            title="Można anulować tylko zamówienia w trakcie"
-            class="bg-gray-300 text-white px-2 py-1 rounded text-sm opacity-50 cursor-not-allowed"
-        @endif
-    >
-        Anuluj
-    </button>
-</form>
-
-
-
-
+                    <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="inline">@csrf @method('DELETE')
+                        <button onclick="return confirm('Na pewno?')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Usuń</button>
+                    </form>
+                    <form action="{{ route('admin.orders.cancel', $order) }}" method="POST" class="inline">@csrf
+                        <button
+                            @if ($order->status === 'in_progress')
+                                onclick="return confirm('Czy na pewno anulować to zamówienie?')"
+                                class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-sm"
+                            @else
+                                disabled title="Można anulować tylko zamówienia w trakcie"
+                                class="bg-gray-300 text-white px-2 py-1 rounded text-sm opacity-50 cursor-not-allowed"
+                            @endif>
+                            Anuluj
+                        </button>
+                    </form>
+                    <form action="{{ route('admin.orders.complete', $order) }}" method="POST" class="inline">@csrf
+                        <button
+                            @if ($order->status !== 'in_progress')
+                                disabled title="Można zakończyć tylko zamówienia w trakcie"
+                                class="bg-green-200 text-white px-2 py-1 rounded text-sm opacity-50 cursor-not-allowed"
+                            @else
+                                onclick="return confirm('Oznaczyć zamówienie jako zakończone?')"
+                                class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm"
+                            @endif>
+                            Zakończ
+                        </button>
+                    </form>
                 </td>
             </tr>
         @empty
-            <tr><td colspan="7" class="p-4 text-center text-gray-500">Brak wyników</td></tr>
+            <tr><td colspan="8" class="p-4 text-center text-gray-500">Brak wyników</td></tr>
         @endforelse
     </tbody>
 </table>
