@@ -69,8 +69,11 @@ Route::prefix('admin')
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
         Route::resource('users', AdminUserController::class)->except('show');
         Route::resource('products', AdminProductController::class)->except('show');
+
+        // Orers
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/create', [AdminOrderController::class, 'create'])->name('orders.create');
         Route::post('/orders', [AdminOrderController::class, 'store'])->name('orders.store');
@@ -79,6 +82,8 @@ Route::prefix('admin')
         Route::put('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
         Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
         Route::post('/orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
+        Route::post('/orders/{order}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete'); // ✅ NOWA TRASA
+
         Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
     });
 
@@ -90,7 +95,6 @@ Route::prefix('staff')
 
         //Complete an order manually (custom route)
         Route::post('/orders/{order}/complete', [\App\Http\Controllers\Staff\OrderController::class, 'complete'])->name('orders.complete');
-
 
         // 🔧 Cancel an order manually (custom route)
         Route::post('/orders/{order}/cancel', [\App\Http\Controllers\Staff\OrderController::class, 'cancel'])->name('orders.cancel');

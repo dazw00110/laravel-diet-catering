@@ -67,9 +67,19 @@ class Order extends Model
     return $this->hasMany(\App\Models\ProductReview::class, 'order_id');
 }
     public function hasReviews(): bool
-{
-    return $this->reviews()->exists();
-}
+    {
+        foreach ($this->items as $item) {
+            $hasReview = $item->product->reviews()
+                ->where('user_id', $this->user_id)
+                ->exists();
+
+            if (!$hasReview) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 public function productReviews()
 {
     return $this->hasManyThrough(ProductReview::class, OrderItem::class, 'order_id', 'product_id', 'id', 'product_id');
