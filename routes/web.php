@@ -22,16 +22,16 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Client\ClientOrderController;
 use App\Http\Controllers\Client\ProductReviewController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\GuestOfferController;
 
-
-// Home Page
-Route::get('/', fn () => view('welcome'))->name('home');
+Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 // Registration and Login
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/register', [RegisteredUserController::class, 'store']);
-    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
     // Password reset (without email)
@@ -157,8 +157,15 @@ Route::prefix('client')
         Route::get('/orders/{order}/reviews/create', [ProductReviewController::class, 'create'])->name('orders.reviews.create');
 Route::post('/orders/{order}/reviews', [ProductReviewController::class, 'store'])->name('orders.reviews.store');
     });
+Route::get('/oferty', [GuestOfferController::class, 'index'])->name('guest.offers');
 
+Route::get('/home', function () {
+    return redirect()->route('landing'); // lub inna strona docelowa
+})->name('home');
 
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+});
 // ErrorViews (only on local)
 if (app()->environment('local')) {
     Route::post('/2fa/disable', function () {
@@ -191,4 +198,5 @@ if (app()->environment('local')) {
     Route::get('/test419', fn () => abort(419));
     Route::get('/test422', fn () => abort(422));
     Route::get('/test500', fn () => abort(500));
+
 }
