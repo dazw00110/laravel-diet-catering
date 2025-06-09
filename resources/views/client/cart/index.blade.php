@@ -108,7 +108,7 @@
         <!-- Formularz dat -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
 
-            <form method="POST" action="{{ route('client.cart.updateDates') }}" class="space-y-4">
+            <form method="POST" action="{{ route('client.cart.updateDates') }}" class="space-y-4" x-data x-on:change.debounce.500ms="$el.submit()">
                 @csrf
                 @method('PATCH')
 
@@ -149,11 +149,8 @@
                         class="input input-bordered w-auto"
                     >
                 </div>
-
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition cursor-pointer">
-                    Zapisz daty
-                </button>
             </form>
+
 
             <!-- Formularz zamówienia -->
             <div class="space-y-4">
@@ -309,8 +306,14 @@ function cartData() {
     return {
         total: 0,
         discountCode: '',
-        discountValue: 0,  // wartość rabatu % z aktywowanego kodu
-        availableDiscounts: @json($userDiscounts->map(fn($d) => ['code' => strtolower($d->code), 'value' => $d->type === 'percentage' ? $d->value : 0])),
+        discountValue: 0,
+        discountType: null,
+        discountAmount: 0,
+        availableDiscounts: @json($userDiscounts->map(fn($d) => [
+            'code' => strtolower($d->code),
+            'value' => $d->value,
+            'type' => $d->type
+        ])),
         calculateTotal() {
             let items = @json($cart->items);
             let days = {{ $days }};
@@ -339,11 +342,18 @@ function cartData() {
             if (total >= 3000) total *= 0.85;
             else if (total >= 2000) total *= 0.90;
 
-            // Zastosuj rabat procentowy z kodu
-            if (this.discountValue > 0) {
-                total = total * (1 - this.discountValue / 100);
+            let discount = 0;
+            if (this.discountValue > 0 && this.discountType) {
+                if (this.discountType === 'percentage') {
+                    discount = total * (this.discountValue / 100);
+                    total = total - discount;
+                } else if (this.discountType === 'fixed') {
+                    discount = this.discountValue;
+                    total = total - discount;
+                }
             }
 
+            this.discountAmount = discount.toFixed(2);
             this.total = total.toFixed(2);
         },
         formattedTotal() {
@@ -355,20 +365,33 @@ function cartData() {
             let discount = this.availableDiscounts.find(d => d.code === code);
             if (discount) {
                 this.discountValue = discount.value;
-                alert(`Kod rabatowy aktywowany! Rabat: ${discount.value}%`);
+                this.discountType = discount.type;
+
+                const label = discount.type === 'percentage'
+                    ? `-${discount.value.toFixed(2)}%`
+                    : `-${discount.value.toFixed(2)} zł`;
+
+                alert(`Kod rabatowy aktywowany! Rabat: ${label}`);
                 this.calculateTotal();
             } else {
                 alert("Nie znaleziono takiego kodu rabatowego lub jest nieaktywny.");
+                this.discountCode = '';
                 this.discountValue = 0;
+                this.discountType = null;
+                this.discountAmount = 0;
+                this.calculateTotal();
             }
         },
         removeDiscount() {
             this.discountCode = '';
             this.discountValue = 0;
+            this.discountType = null;
+            this.discountAmount = 0;
             alert("Kod rabatowy usunięty.");
             this.calculateTotal();
         }
     }
 }
 </script>
+
 @endsection

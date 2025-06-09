@@ -41,6 +41,7 @@ class Product extends Model
         return $this->hasMany(ProductReview::class);
     }
 
+
     public function hasActivePromotion()
     {
         return $this->promotion_price &&

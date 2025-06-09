@@ -212,23 +212,19 @@ class CartController extends Controller
     public function updateDates(Request $request)
     {
         $request->validate([
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after:start_date|before_or_equal:' . now()->addYear()->format('Y-m-d'),
         ]);
 
         $cart = Order::getOrCreateCartForUser(Auth::id());
 
-        $startDate = now()->parse($request->input('start_date'));
-
-        if ($startDate->lt(now()->startOfDay())) {
-            return redirect()->route('client.cart.index')->with('error', 'Nie można ustawić daty wcześniejszej niż dziś.');
-        }
-
-        $cart->start_date = $startDate;
-        $cart->end_date = $startDate->copy()->addDays(20); // możesz dopasować liczbę dni
+        $cart->start_date = now()->parse($request->input('start_date'));
+        $cart->end_date = now()->parse($request->input('end_date'));
         $cart->save();
 
-        return redirect()->route('client.cart.index')->with('success', 'Zaktualizowano datę rozpoczęcia.');
+        return redirect()->route('client.cart.index')->with('success', 'Zaktualizowano daty cateringu.');
     }
+
 
     public function extend()
     {

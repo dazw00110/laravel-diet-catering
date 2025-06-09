@@ -134,8 +134,9 @@ Route::prefix('client')
     ->name('client.')
     ->group(function () {
         Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('dashboard');
+
         Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-        Route::get('/products/{product}/reviews', [ProductController::class, 'reviews'])->name('products.reviews'); // jeśli chcesz, możesz też tę trasę usunąć jeśli przeglądanie opinii też ma zniknąć
+        Route::get('/products/{product}/reviews', [ProductController::class, 'reviews'])->name('products.reviews');
 
         Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
         Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
@@ -147,25 +148,28 @@ Route::prefix('client')
         Route::patch('/cart/update-dates', [CartController::class, 'updateDates'])->name('cart.updateDates');
         Route::post('/cart/extend', [CartController::class, 'extend'])->name('cart.extend');
 
+        Route::get('/orders/{order}/reviews/create', [ProductReviewController::class, 'create'])->name('orders.reviews.create');
+        Route::post('/orders/{order}/reviews', [ProductReviewController::class, 'store'])->name('orders.reviews.store');
+
         Route::get('/orders', [ClientOrderController::class, 'index'])->name('orders.index');
         Route::post('/orders/{order}/cancel', [ClientOrderController::class, 'cancel'])->name('orders.cancel');
-        Route::post('/cart/repeat-order/{order}', [CartController::class, 'repeatOrder'])->name('cart.repeatOrder');
+        Route::post('/orders/{order}/repeat', [ClientOrderController::class, 'repeat'])->name('orders.repeat');
 
         Route::get('/contact', fn () => view('client.contact'))->name('contact');
         Route::get('/account', fn () => view('client.profile'))->name('profile');
-
-        Route::get('/orders/{order}/reviews/create', [ProductReviewController::class, 'create'])->name('orders.reviews.create');
-Route::post('/orders/{order}/reviews', [ProductReviewController::class, 'store'])->name('orders.reviews.store');
     });
+
+
 Route::get('/oferty', [GuestOfferController::class, 'index'])->name('guest.offers');
 
 Route::get('/home', function () {
-    return redirect()->route('landing'); // lub inna strona docelowa
+    return redirect()->route('landing');
 })->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 });
+
 // ErrorViews (only on local)
 if (app()->environment('local')) {
     Route::post('/2fa/disable', function () {
