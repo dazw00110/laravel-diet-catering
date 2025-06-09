@@ -18,7 +18,7 @@ class UserController extends Controller
         if ($request->filled('name')) {
             $query->where(function ($q) use ($request) {
                 $q->where('first_name', 'ILIKE', '%' . $request->name . '%')
-                ->orWhere('last_name', 'ILIKE', '%' . $request->name . '%');
+                    ->orWhere('last_name', 'ILIKE', '%' . $request->name . '%');
             });
         }
 
@@ -55,7 +55,6 @@ class UserController extends Controller
         return view('staff.users.index', compact('users'));
     }
 
-
     public function create()
     {
         return view('staff.users.create');
@@ -64,9 +63,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255', 'regex:/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+$/u'],
-            'last_name' => ['required', 'string', 'max:255', 'regex:/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(-[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)?$/u'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'first_name' => ['required', 'string', 'max:255', "regex:/^[\pL\s'.-]+$/u"],
+            'last_name' => ['required', 'string', 'max:255', "regex:/^[\pL\s'.-]+$/u"],
+            'email' => ['required', 'string', 'email:rfc', 'max:255', 'unique:users,email'],
             'birth_date' => ['required', 'date'],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
@@ -76,7 +75,7 @@ class UserController extends Controller
         $user->last_name = $validated['last_name'];
         $user->email = $validated['email'];
         $user->birth_date = $validated['birth_date'];
-        $user->user_type_id = 2; 
+        $user->user_type_id = 2;
         $user->password = Hash::make($validated['password']);
         $user->is_vegetarian = $request->has('is_vegetarian');
         $user->is_vegan = $request->has('is_vegan');
@@ -84,7 +83,6 @@ class UserController extends Controller
 
         return redirect()->route('staff.users.index')->with('success', 'Klient został pomyślnie dodany.');
     }
-
 
     public function edit(User $user)
     {
@@ -102,20 +100,20 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+$/u'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+(-[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)?$/u'],
+            'password' => ['nullable', 'confirmed', 'min:8'],
         ]);
 
-        $user->name = $validated['name'];
-        $user->email = $validated['email'];
+        $user->first_name = $validated['first_name'];
+        $user->last_name = $validated['last_name'];
         $user->is_vegetarian = $request->has('is_vegetarian');
         $user->is_vegan = $request->has('is_vegan');
+
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
         $user->save();
 
         return redirect()->route('staff.users.index')->with('success', 'Dane klienta zostały zaktualizowane.');

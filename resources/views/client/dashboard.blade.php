@@ -5,7 +5,7 @@
 @section('content')
 
 <div>
-    <!-- 🔥 HERO -->
+    <!-- HERO -->
     <section class="relative h-[500px] bg-cover bg-center text-white"
              style="background-image: url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=2070&auto=format&fit=crop');">
         <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -13,7 +13,7 @@
         </div>
     </section>
 
-    <!-- ✨ KARUZELA -->
+    <!-- CAROUSEL -->
     <section class="py-16 bg-gray-50"
         x-data="{
             start: 0,
@@ -130,7 +130,7 @@
             </div>
         </div>
 
-        <!-- ✅ TOAST w prawym dolnym rogu -->
+        <!-- TOAST in the bottom right corner -->
         <div x-show="showToast" x-transition
              class="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-800 px-6 py-3 rounded shadow-lg z-50 flex items-center space-x-4"
              x-cloak>
@@ -139,7 +139,7 @@
         </div>
     </section>
 
-    <!-- 📞 KONTAKT -->
+    <!-- CONTACT -->
     <section class="bg-white py-16 mt-16 border-t">
         <div class="max-w-4xl mx-auto text-center px-4">
             <h2 class="text-2xl font-bold mb-4">Masz wątpliwości? Chcesz o coś zapytać?</h2>
