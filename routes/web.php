@@ -15,7 +15,6 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 
-use App\Http\Controllers\Client\DashboardController;
 use App\Http\Controllers\Client\ProductController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -82,7 +81,7 @@ Route::prefix('admin')
         Route::put('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
         Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
         Route::post('/orders/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
-        Route::post('/orders/{order}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete'); // ✅ NOWA TRASA
+        Route::post('/orders/{order}/complete', [AdminOrderController::class, 'complete'])->name('orders.complete');
 
         Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
     });
@@ -96,22 +95,25 @@ Route::prefix('staff')
         //Complete an order manually (custom route)
         Route::post('/orders/{order}/complete', [\App\Http\Controllers\Staff\OrderController::class, 'complete'])->name('orders.complete');
 
-        // 🔧 Cancel an order manually (custom route)
+        // Cancel an order manually (custom route)
         Route::post('/orders/{order}/cancel', [\App\Http\Controllers\Staff\OrderController::class, 'cancel'])->name('orders.cancel');
 
-        // 📊 Staff dashboard view
+        // Staff dashboard view
         Route::get('/dashboard', [\App\Http\Controllers\Staff\DashboardController::class, 'index'])->name('dashboard');
 
-        // 📈 Staff sales statistics with charts and calculations
+        // Staff sales statistics with charts and calculations
         Route::get('/stats', [\App\Http\Controllers\Staff\StatsController::class, 'index'])->name('stats.index');
 
-        // 🛒 Product management for staff (only: index, edit, update)
+        // Product management for staff (only: index, edit, update)
         Route::resource('products', \App\Http\Controllers\Staff\ProductController::class)->only(['index', 'edit', 'update']);
 
-        // 📦 Full CRUD for orders (create, view, edit, update, delete)
+        // Full CRUD for orders (create, view, edit, update, delete)
         Route::resource('orders', \App\Http\Controllers\Staff\OrderController::class);
 
-        // ⚡ Last-minute promotion routes
+        // Partial CRUD for users
+        Route::resource('users', \App\Http\Controllers\Staff\UserController::class)->except(['destroy', 'show']);
+
+        // Last-minute promotion routes
         Route::get('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'promotion'])->name('products.promotion');
         Route::post('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'storePromotion'])->name('products.promotion.store');
         Route::delete('/products/{product}/promotion', [\App\Http\Controllers\Staff\ProductController::class, 'removePromotion'])->name('products.promotion.remove');
