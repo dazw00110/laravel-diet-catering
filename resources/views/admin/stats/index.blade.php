@@ -13,7 +13,14 @@
             <div class="flex flex-col md:flex-row gap-4 items-center">
                 <label>
                 📅 Miesiąc:
-                <input type="month" name="month" value="{{ request('month', now()->format('Y-m')) }}" class="input input-bordered" />
+                <input
+                    type="month"
+                    name="month"
+                    value="{{ request('month', now()->format('Y-m')) }}"
+                    min="2000-01"
+                    max="{{ now()->format('Y-m') }}"
+                    class="input input-bordered"
+                />
             </label>
 
                 <label>

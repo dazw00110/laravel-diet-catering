@@ -39,11 +39,20 @@
         </div>
 
         <div>
-            <label class="block text-sm">Data urodzenia</label>
-            <input type="date" name="birth_date" value="{{ old('birth_date') }}"
-                   class="w-full border border-gray-300 rounded px-4 py-2" required>
+            <label for="birth_date" class="block text-sm">Data urodzenia</label>
+            <input
+                type="date"
+                id="birth_date"
+                name="birth_date"
+                value="{{ old('birth_date') }}"
+                class="w-full border border-gray-300 rounded px-4 py-2"
+                min="{{ now()->subYears(150)->toDateString() }}"
+                max="{{ now()->subYears(14)->toDateString() }}"
+                required
+            >
+            <x-input-error :messages="$errors->get('birth_date')" class="mt-2" />
         </div>
-
+        
         <div class="flex gap-4">
             <label class="inline-flex items-center">
                 <input type="checkbox" name="is_vegetarian" value="1" {{ old('is_vegetarian') ? 'checked' : '' }}>

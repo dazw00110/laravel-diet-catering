@@ -13,6 +13,15 @@ class StatsController extends Controller
 {
     public function index(Request $request)
     {
+        $request->validate([
+            'month' => [
+                'nullable',
+                'date_format:Y-m',
+                'after_or_equal:2000-01',
+                'before_or_equal:' . now()->format('Y-m'),
+            ],
+        ]);
+
         $selectedMonth = $request->input('month', now()->format('Y-m'));
         $selectedStatus = $request->input('status', 'completed');
 

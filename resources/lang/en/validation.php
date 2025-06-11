@@ -137,7 +137,7 @@ return [
     'prohibited_if_declined' => 'Pole :attribute jest zabronione, gdy :other zostało odrzucone.',
     'prohibited_unless' => 'Pole :attribute jest zabronione, chyba że :other znajduje się w: :values.',
     'prohibits' => 'Pole :attribute zabrania obecności pola :other.',
-    'regex' => 'Format pola :attribute jest nieprawidłowy.(nieprawidłowe znaki lub format)',
+    'regex' => 'Format pola :attribute jest nieprawidłowy. (Nieprawidłowe znaki lub format)',
     'required' => 'Pole :attribute jest wymagane.',
     'required_array_keys' => 'Pole :attribute musi zawierać wpisy dla: :values.',
     'required_if' => 'Pole :attribute jest wymagane, gdy :other ma wartość :value.',
@@ -180,6 +180,20 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+    
+        'birth_date' => [
+            'after_or_equal' => 'Podana data jest zbyt odległa w przeszłości.',
+            'before_or_equal' => 'Użytkownik musi mieć co najmniej 14 lat.',
+        ],
+
+        'start_from' => [
+            'after_or_equal' => 'Data początkowa  jest zbyt odległa w przyszłości.',
+            'before_or_equal' => 'Data początkowa nie może być późniejsza niż dziś.',
+        ],
+        'end_to' => [
+            'after_or_equal' => 'Data końcowa jest zbyt odległa w przeszłości.',
+            'before_or_equal' => 'Data końcowa nie może być późniejsza niż rok do przodu.',
+        ],
     ],
 
     /*
@@ -193,6 +207,13 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+    'first_name' => 'imię',
+    'last_name' => 'nazwisko',
+    'email' => 'adres email',
+    'birth_date' => 'data urodzenia',
+    'password' => 'hasło',
+    'password_confirmation' => 'potwierdzenie hasła',
+],
 
 ];

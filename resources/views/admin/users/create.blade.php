@@ -24,7 +24,17 @@
 
         <div>
             <label class="block">Data urodzenia</label>
-            <input type="date" name="birth_date" class="w-full border border-gray-300 rounded px-4 py-2" required>
+            <input
+                type="date"
+                name="birth_date"
+                id="birth_date"
+                value="{{ old('birth_date') }}"
+                min="{{ now()->subYears(150)->toDateString() }}"
+                max="{{ now()->toDateString() }}"
+                class="input input-bordered w-full"
+                required
+            >
+            <x-input-error :messages="$errors->get('birth_date')" class="mt-2" />
         </div>
 
         <div class="flex items-center gap-6 mb-4">

@@ -11,47 +11,44 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     public function index(Request $request)
-{
-    $query = User::with('userType');
+    {
+        $query = User::with('userType');
 
-    if ($request->filled('name')) {
-        $query->whereRaw("LOWER(CONCAT(first_name, ' ', last_name)) LIKE ?", ['%' . strtolower($request->name) . '%']);
+        if ($request->filled('name')) {
+            $query->whereRaw("LOWER(CONCAT(first_name, ' ', last_name)) LIKE ?", ['%' . strtolower($request->name) . '%']);
+        }
+
+        if ($request->filled('email')) {
+            $query->where('email', 'like', '%' . $request->email . '%');
+        }
+
+        if ($request->has('is_vegetarian')) {
+            $query->where('is_vegetarian', true);
+        }
+
+        if ($request->has('is_vegan')) {
+            $query->where('is_vegan', true);
+        }
+
+        if ($request->filled('user_type_id')) {
+            $query->where('user_type_id', $request->user_type_id);
+        }
+
+        $sortable = ['id', 'first_name', 'last_name', 'created_at'];
+        $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
+        $direction = $request->get('dir') === 'asc' ? 'asc' : 'desc';
+
+        if ($sort === 'name') {
+            $query->orderBy('first_name', $direction)->orderBy('last_name', $direction);
+        } else {
+            $query->orderBy($sort, $direction);
+        }
+
+        $perPage = in_array($request->get('per_page'), [10, 30, 50]) ? $request->get('per_page') : 10;
+        $users = $query->paginate($perPage)->appends($request->all());
+
+        return view('admin.users.index', compact('users'));
     }
-
-    if ($request->filled('email')) {
-        $query->where('email', 'like', '%' . $request->email . '%');
-    }
-
-    if ($request->has('is_vegetarian')) {
-        $query->where('is_vegetarian', true);
-    }
-
-    if ($request->has('is_vegan')) {
-        $query->where('is_vegan', true);
-    }
-
-
-    if ($request->filled('user_type_id')) {
-        $query->where('user_type_id', $request->user_type_id);
-    }
-
-    // Sorting logic
-    $sortable = ['id', 'first_name', 'last_name', 'created_at'];
-    $sort = in_array($request->get('sort'), $sortable) ? $request->get('sort') : 'id';
-    $direction = $request->get('dir') === 'asc' ? 'asc' : 'desc';
-
-    if ($sort === 'name') {
-        $query->orderBy('first_name', $direction)->orderBy('last_name', $direction);
-    } else {
-        $query->orderBy($sort, $direction);
-    }
-
-    $perPage = in_array($request->get('per_page'), [10, 30, 50]) ? $request->get('per_page') : 10;
-    $users = $query->paginate($perPage)->appends($request->all());
-
-
-    return view('admin.users.index', compact('users'));
-}
 
     public function create()
     {
@@ -65,13 +62,17 @@ class UserController extends Controller
             'last_name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'birth_date' => 'required|date',
+            'birth_date' => [
+                'required',
+                'date',
+                'after_or_equal:' . now()->subYears(150)->toDateString(),
+                'before_or_equal:' . now()->subYears(14)->toDateString(),
+            ],
             'user_type_id' => ['required', Rule::in([1, 2, 3])],
         ]);
 
         $validated['is_vegetarian'] = $request->has('is_vegetarian');
         $validated['is_vegan'] = $request->has('is_vegan');
-
         $validated['password'] = Hash::make($validated['password']);
 
         User::create($validated);
@@ -96,7 +97,6 @@ class UserController extends Controller
 
         $validated['is_vegetarian'] = $request->has('is_vegetarian');
         $validated['is_vegan'] = $request->has('is_vegan');
-
 
         if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);

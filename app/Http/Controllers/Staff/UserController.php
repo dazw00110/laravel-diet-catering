@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query()->where('user_type_id', 2); // tylko klienci
+        $query = User::query()->where('user_type_id', 2);
 
         if ($request->filled('name')) {
             $query->where(function ($q) use ($request) {
@@ -55,7 +55,12 @@ class UserController extends Controller
             'first_name' => ['required', 'string', 'max:255', "regex:/^[\pL\s'.-]+$/u"],
             'last_name' => ['required', 'string', 'max:255', "regex:/^[\pL\s'.-]+$/u"],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'birth_date' => ['required', 'date'],
+            'birth_date' => [
+            'required',
+            'date',
+            'before_or_equal:' . now()->subYears(14)->toDateString(),
+            'after_or_equal:' . now()->subYears(150)->toDateString(),
+        ],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 

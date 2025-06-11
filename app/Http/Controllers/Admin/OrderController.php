@@ -17,6 +17,22 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+            $request->validate([
+        'start_from' => [
+            'nullable',
+            'date',
+            'after_or_equal:2000-01-01',
+            'before_or_equal:' . now()->toDateString(),
+        ],
+        'end_to' => [
+            'nullable',
+            'date',
+            'after_or_equal:2000-01-01',
+            'before_or_equal:' . now()->addYear()->toDateString(),
+        ],
+    ]);
+
+
         $query = Order::with(['user', 'items.product']);
 
         if ($request->filled('client')) {
@@ -50,13 +66,13 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders'));
     }
 
-  public function create()
-{
-    $clients = User::whereHas('userType', fn($q) => $q->where('name', 'client'))->get();
-    $products = Product::where('is_active', true)->get();
-    $allDiscounts = Discount::with('users')->get();
-    return view('admin.orders.create', compact('clients', 'products', 'allDiscounts'));
-}
+    public function create()
+    {
+        $clients = User::whereHas('userType', fn($q) => $q->where('name', 'client'))->get();
+        $products = Product::where('is_active', true)->get();
+        $allDiscounts = Discount::with('users')->get();
+        return view('admin.orders.create', compact('clients', 'products', 'allDiscounts'));
+    }
 
 
     public function show(Order $order)
@@ -271,7 +287,7 @@ class OrderController extends Controller
                 $order->discount_code = $newDiscountCode;
             }
 
-            // 4+1 gratis na poziomie produktu
+            // 4+1 free at product level
             $productCounts = [];
             foreach ($request->items as $item) {
                 $productCounts[$item['product_id']] = ($productCounts[$item['product_id']] ?? 0) + $item['quantity'];

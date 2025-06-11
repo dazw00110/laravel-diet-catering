@@ -17,6 +17,21 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+    $request->validate([
+        'start_from' => [
+            'nullable',
+            'date',
+            'after_or_equal:2000-01-01',
+            'before_or_equal:' . now()->toDateString(),
+        ],
+        'end_to' => [
+            'nullable',
+            'date',
+            'after_or_equal:2000-01-01',
+            'before_or_equal:' . now()->addYear()->toDateString(),
+        ],
+    ]);
+
         $query = Order::with(['user', 'items.product']);
 
         if ($request->filled('client')) {
