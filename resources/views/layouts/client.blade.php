@@ -30,7 +30,7 @@
                 <a href="{{ route('client.products.index') }}" class="hover:text-green-600">Oferty</a>
                 <a href="{{ route('client.contact') }}" class="hover:text-green-600">Kontakt</a>
                 <a href="{{ route('client.orders.index') }}" class="hover:text-green-600">Moje zamówienia</a>
-                <a href="{{ route('client.profile') }}" class="hover:text-green-600">Moje konto</a>
+                <a href="{{ route('profile.show') }}" class="hover:text-green-600">Moje konto</a>
                 <a href="{{ route('client.cart.index') }}" class="hover:text-green-600">Koszyk</a>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf

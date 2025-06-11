@@ -45,16 +45,20 @@ class ProductReviewController extends Controller
      */
     public function store(Request $request, Order $order): RedirectResponse
     {
+        $reviews = collect($request->input('reviews'))->filter(function($review) {
+            return isset($review['rating']) && $review['rating'] !== null && $review['rating'] !== '';
+        });
+
+        $request->replace(['reviews' => $reviews->all()]);
+
         $request->validate([
             'reviews.*.product_id' => 'required|exists:products,id',
             'reviews.*.rating' => 'required|integer|min:1|max:5',
             'reviews.*.comment' => 'nullable|string|max:1000',
         ]);
 
-        $reviews = $request->input('reviews');
-
         foreach ($reviews as $reviewData) {
-            ProductReview::create([
+            \App\Models\ProductReview::create([
                 'user_id' => auth()->id(),
                 'product_id' => $reviewData['product_id'],
                 'rating' => $reviewData['rating'],
@@ -64,7 +68,7 @@ class ProductReviewController extends Controller
 
         $productIdsInOrder = $order->items->pluck('product_id')->toArray();
 
-        $ratingsForThisOrder = collect($reviews)
+        $ratingsForThisOrder = $reviews
             ->filter(fn($r) => in_array($r['product_id'], $productIdsInOrder))
             ->pluck('rating');
 
@@ -74,9 +78,9 @@ class ProductReviewController extends Controller
             $order->status === 'cancelled' &&
             $order->cancellation &&
             !$order->cancellation->discount &&
-            $average < 2.0
+            $average !== null && $average < 2.0
         ) {
-            $discount = Discount::where(function ($q) {
+            $discount = \App\Models\Discount::where(function ($q) {
                     $q->whereNull('expires_at')
                       ->orWhere('expires_at', '>', now());
                 })
@@ -92,14 +96,14 @@ class ProductReviewController extends Controller
                 ]);
 
                 return redirect()->route('client.orders.index')
-                    ->with('success', 'Otrzymałeś rabat za niezadowolenie z cateringu: ' . $discount->code);
+                    ->with('success', 'Otrzymałeś kod rabatowy za niską ocenę zamówienia: <b>' . $discount->code . '</b>. Kod jest już przypisany do Twojego konta i możesz go wykorzystać przy kolejnym zamówieniu.');
             } else {
                 return redirect()->route('client.orders.index')
-                    ->with('error', 'Nie znaleziono dostępnych kuponów rabatowych.');
+                    ->with('error', 'Nie znaleziono dostępnych kuponów rabatowych. Skontaktuj się z obsługą.');
             }
         }
 
         return redirect()->route('client.orders.index')
-            ->with('success', 'Dziękujemy za opinię!');
+            ->with('success', 'Dziękujemy za opinię! Twoje oceny zostały zapisane.');
     }
 }

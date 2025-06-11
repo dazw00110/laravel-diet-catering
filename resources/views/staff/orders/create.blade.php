@@ -113,6 +113,20 @@
             <p class="mt-2 font-bold text-right">Suma: <span x-text="totalPrice + ' zł'"></span></p>
         </div>
 
+        <div class="bg-gray-100 p-4 rounded mt-6">
+            <h2 class="font-semibold mb-2">Promocje i rabaty</h2>
+            <ul class="list-disc pl-5 text-sm">
+                <li>🎁 <strong>Kody rabatowe:</strong> Możesz użyć dostępnych kodów rabatowych (sekcja powyżej).</li>
+                <li>🎉 <strong>4+1 gratis:</strong> Za każde 5 sztuk tego samego produktu – 1 sztuka gratis (liczone na cały okres zamówienia).</li>
+                <li>💰 <strong>Duże zamówienie:</strong> Rabat 10% dla zamówień powyżej 2000 zł, rabat 15% powyżej 3000 zł (po uwzględnieniu promocji 4+1).</li>
+                <li>🔁 <strong>Rabat za regularność:</strong> Jeśli w ciągu ostatnich 7 dni zrealizowano 3 zamówienia – dodatkowy rabat 5%.</li>
+                <li>😔 <strong>Rabat za niezadowolenie:</strong> Jeśli klient anuluje zamówienie i wystawi niską ocenę (średnia &lt; 2), może otrzymać dodatkowy kod rabatowy.</li>
+                <li>🏅 <strong>Program lojalnościowy:</strong> Po wydaniu 10 000 zł klient otrzyma stałą zniżkę -5%, a po przekroczeniu 15 000 zł -10% na każde zamówienie.<br>
+                    <span class="italic text-blue-700">Funkcjonalność programu lojalnościowego nie jest jeszcze wdrożona.</span>
+                </li>
+            </ul>
+        </div>
+
         <button type="submit" class="btn bg-green-600 text-white w-full">Zamów</button>
     </form>
 </div>

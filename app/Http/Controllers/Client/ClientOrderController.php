@@ -16,19 +16,44 @@ class ClientOrderController extends Controller
     {
         $user = auth()->user();
 
-        $activeOrders = Order::with(['items.product'])
+        // Filtrowanie i sortowanie
+        $queryActive = Order::with(['items.product'])
             ->where('user_id', $user->id)
-            ->where('status', 'in_progress')
-            ->get();
+            ->where('status', 'in_progress');
+        $queryCompleted = Order::with(['items.product', 'cancellation'])
+            ->where('user_id', $user->id)
+            ->whereIn('status', ['completed', 'cancelled']);
 
-        $completedOrders = Order::with(['items.product', 'cancellation'])
-            ->where('user_id', $user->id)
-            ->whereIn('status', ['completed', 'cancelled'])
-            ->get();
+        // Filtrowanie po ID
+        if (request('order_id')) {
+            $queryActive->where('id', request('order_id'));
+            $queryCompleted->where('id', request('order_id'));
+        }
+        // Filtrowanie po statusie
+        if (request('status')) {
+            $queryActive->where('status', request('status'));
+            $queryCompleted->where('status', request('status'));
+        }
+
+        // Sortowanie
+        $sort = request('sort', 'id_desc');
+        $sortMap = [
+            'id_desc' => ['id', 'desc'],
+            'id_asc' => ['id', 'asc'],
+            'date_desc' => ['created_at', 'desc'],
+            'date_asc' => ['created_at', 'asc'],
+            'total_desc' => ['total_price', 'desc'],
+            'total_asc' => ['total_price', 'asc'],
+        ];
+        $sortActive = $sortMap[$sort] ?? ['id', 'desc'];
+        $sortCompleted = $sortMap[$sort] ?? ['id', 'desc'];
+
+        $activeOrders = $queryActive->orderBy($sortActive[0], $sortActive[1])->get();
+        $completedOrders = $queryCompleted->orderBy($sortCompleted[0], $sortCompleted[1])->get();
 
         foreach ($activeOrders as $order) {
             foreach ($order->items as $item) {
-                $item->has_review = ProductReview::where('user_id', $user->id)
+                $item->has_review = \App\Models\ProductReview::where('user_id', $user->id)
                     ->where('product_id', $item->product_id)
                     ->exists();
             }
@@ -36,7 +61,7 @@ class ClientOrderController extends Controller
 
         foreach ($completedOrders as $order) {
             foreach ($order->items as $item) {
-                $item->has_review = ProductReview::where('user_id', $user->id)
+                $item->has_review = \App\Models\ProductReview::where('user_id', $user->id)
                     ->where('product_id', $item->product_id)
                     ->exists();
             }
@@ -87,20 +112,20 @@ class ClientOrderController extends Controller
             $cartItem->save();
         }
 
-        // Kopiuj daty i adres z poprzedniego zamówienia
-        $cart->start_date = now()->toDateString();
-        $cart->end_date = now()->copy()->addDays(
-            $order->end_date->diffInDays($order->start_date)
-        )->toDateString();
-
+        // Kopiuj adres z poprzedniego zamówienia
         $cart->city = $order->city;
         $cart->postal_code = $order->postal_code;
         $cart->street = $order->street;
         $cart->apartment_number = $order->apartment_number;
 
+        // Ustaw nową datę rozpoczęcia na dziś, a zakończenia na dziś + tyle dni ile trwało poprzednie zamówienie (włącznie z obiema datami)
+        $duration = $order->start_date->diffInDays($order->end_date) + 1;
+        $cart->start_date = now()->toDateString();
+        $cart->end_date = now()->copy()->addDays($duration - 1)->toDateString();
+
         $cart->total_price = $cart->items->sum(fn($i) => $i->quantity * $i->unit_price);
         $cart->save();
 
-        return redirect()->route('client.cart.index')->with('success', 'Produkty dodano do koszyka.');
+        return redirect()->route('client.cart.index')->with('success', 'Produkty i dane z poprzedniego zamówienia zostały dodane do koszyka.');
     }
 }

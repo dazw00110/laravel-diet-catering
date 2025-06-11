@@ -26,11 +26,10 @@ class ProductController extends Controller
             $query->where('price', '<=', (int)$request->input('price_max'));
         }
 
-        if ($request->boolean('is_vegan')) {
+        // Filtrowanie po diecie
+        if ($request->input('diet') === 'vegan') {
             $query->where('is_vegan', true);
-        }
-
-        if ($request->boolean('is_vegetarian')) {
+        } elseif ($request->input('diet') === 'vegetarian') {
             $query->where('is_vegetarian', true);
         }
 

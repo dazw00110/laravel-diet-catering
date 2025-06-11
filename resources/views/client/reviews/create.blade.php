@@ -59,7 +59,6 @@
                                 value="{{ $i }}"
                                 class="sr-only peer"
                                 {{ old('reviews.' . $index . '.rating') == $i ? 'checked' : '' }}
-                                required
                             >
                             <label for="rating-{{ $index }}-star-{{ $i }}"
                                    class="cursor-pointer text-3xl text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 transition-colors"

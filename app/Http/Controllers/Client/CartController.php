@@ -76,6 +76,26 @@ class CartController extends Controller
     {
         $cart = Order::getOrCreateCartForUser(Auth::id());
 
+        // Obsługa AJAX PATCH (item_id, quantity)
+        if ($request->has('item_id') && $request->has('quantity')) {
+            $item = $cart->items()->find($request->input('item_id'));
+            $qty = (int)$request->input('quantity');
+            if ($item && $qty > 0 && $qty <= 10) {
+                $item->quantity = $qty;
+                $item->save();
+            }
+            // Jeśli ilość = 0, usuń produkt
+            if ($item && $qty == 0) {
+                $item->delete();
+            }
+            $cart->total_price = $cart->items->sum(fn($i) => $i->quantity * $i->unit_price);
+            $cart->save();
+
+            // Odpowiedź JSON dla AJAX
+            return response()->json(['success' => true]);
+        }
+
+        // Obsługa klasycznych przycisków (zwiększ/zmniejsz)
         if ($request->has('increase')) {
             $item = $cart->items()->find($request->input('increase'));
             if ($item && $item->quantity < 10) {
