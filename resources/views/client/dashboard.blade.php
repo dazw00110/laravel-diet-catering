@@ -19,22 +19,17 @@
     <!-- ✨ KARUZELA -->
     <section class="py-16 bg-gray-50"
         x-data="{
-            start: 0,
-            max: {{ count($products) }},
-            visible: 4,
-            loop: null,
             showToast: false,
             message: '',
-            next() {
-                this.start = (this.start + 1) % this.max;
-                if (this.start > this.max - this.visible) this.start = 0;
-            },
-            prev() {
-                this.start = (this.start - 1 + this.max) % this.max;
-                if (this.start > this.max - this.visible) this.start = this.max - this.visible;
+            init() {
+                @if(session('success'))
+                    this.message = @json(session('success'));
+                    this.showToast = true;
+                    setTimeout(() => this.showToast = false, 2500);
+                @endif
             }
         }"
-        x-init="loop = setInterval(() => next(), 5000)">
+        x-init="init()">
         <div class="max-w-7xl mx-auto px-6">
             <div class="mb-12 text-center">
                 <h2 class="text-3xl font-extrabold text-gray-800 mb-4">🍰 Odkryj nasz catering</h2>
@@ -63,7 +58,7 @@
                             <div class="w-[260px] flex-shrink-0 p-2">
                                 <div class="bg-white rounded-2xl shadow-lg p-4 flex flex-col justify-between h-full border border-gray-100 hover:shadow-xl transition-shadow duration-200">
                                     <div class="relative mb-3">
-                                        <img src="{{ asset('storage/' . ($product->image_path ?? 'products/default.png')) }}"
+                                        <img src="{{ $product->image_url }}"
                                              alt="{{ $product->name }}"
                                              class="w-full h-[160px] object-contain rounded-lg bg-gray-50" />
                                         @if($product->is_vegan)
@@ -109,10 +104,39 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <button @click.prevent="addToCart"
+                                    <form method="POST" action="{{ route('client.cart.add', $product) }}"
+                                        x-on:submit.prevent="
+                                            fetch($el.action, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                    'Accept': 'application/json'
+                                                },
+                                                body: JSON.stringify({ quantity: 1 })
+                                            }).then(async res => {
+                                                let data = await res.json().catch(() => ({}));
+                                                if (res.ok && data.success) {
+                                                    showToast = true;
+                                                    message = data.message || 'Produkt dodano do koszyka.';
+                                                } else {
+                                                    showToast = true;
+                                                    message = data.message || 'Nie można dodać produktu do koszyka.';
+                                                }
+                                                setTimeout(() => showToast = false, 2500);
+                                            }).catch(() => {
+                                                showToast = true;
+                                                message = 'Błąd sieci!';
+                                                setTimeout(() => showToast = false, 2500);
+                                            });
+                                        ">
+                                        @csrf
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit"
                                             class="w-full bg-green-600 text-white py-2 mt-4 rounded-lg hover:bg-green-700 text-sm font-semibold shadow transition">
-                                        ➕ Dodaj do koszyka
-                                    </button>
+                                            ➕ Dodaj do koszyka
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         @endforeach
@@ -129,10 +153,12 @@
         </div>
 
         <div x-show="showToast" x-transition
-             class="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-800 px-6 py-3 rounded shadow-lg z-50 flex items-center space-x-4"
+             class="fixed bottom-6 right-6 bg-green-100 border-2 border-green-500 text-green-900 px-8 py-6 rounded-xl shadow-2xl z-50 flex items-center space-x-6 min-w-[340px] text-lg font-semibold"
+             style="font-size: 1.25rem;"
              x-cloak>
+            <span class="text-2xl">✅</span>
             <span x-text="message"></span>
-            <a href="{{ route('client.cart.index') }}" class="underline text-sm font-semibold">Przejdź do koszyka</a>
+            <a href="{{ route('client.cart.index') }}" class="underline text-base font-bold ml-4">Przejdź do koszyka</a>
         </div>
     </section>
 

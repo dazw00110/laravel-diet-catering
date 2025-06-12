@@ -82,7 +82,7 @@
                 }
                 $bulkDiscountAmount = $totalAfterFree * ($bulkDiscountPercent / 100);
                 if ($bulkDiscountPercent > 0) {
-                    $promotionsApplied[] = "Rabat {$bulkDiscountPercent}% od kwoty powyżej 2000 zł";
+                    $promotionsApplied[] = "Rabat {$bulkDiscountPercent}% od kwoty po 4+1 powyżej " . ($bulkDiscountPercent == 15 ? "3000" : "2000") . " zł";
                 }
 
                 $totalAfterBulk = $totalAfterFree - $bulkDiscountAmount;
@@ -136,7 +136,7 @@
                                     id="end_date"
                                     name="end_date"
                                     value="{{ $cart->end_date->format('Y-m-d') }}"
-                                    min="{{ $cart->start_date->copy()->addDays(7)->format('Y-m-d') }}"
+                                    min="{{ $cart->start_date->copy()->addDays(6)->format('Y-m-d') }}"
                                     max="{{ now()->addYear()->format('Y-m-d') }}"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                                 >
@@ -161,7 +161,7 @@
                                      x-data="{ qty: {{ $item->quantity }} }">
                                     <!-- Product Image -->
                                     <div class="flex-shrink-0">
-                                        <img src="{{ $item->product->image_path ? asset('storage/' . $item->product->image_path) : asset('storage/products/default.png') }}"
+                                        <img src="{{ $item->product->image_url }}"
                                              alt="{{ $item->product->name }}"
                                              class="w-24 h-24 object-cover rounded-lg">
                                     </div>
@@ -189,7 +189,10 @@
                                                 @click="
                                                     if(qty > 1) {
                                                         qty--;
-                                                        $nextTick(() => $dispatch('update-qty', {id: {{ $item->id }}, qty: qty}));
+                                                        $nextTick(() => {
+                                                            $dispatch('update-qty', {id: {{ $item->id }}, qty: qty});
+                                                            calculateTotal();
+                                                        });
                                                     }
                                                 "
                                                 class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-bold transition-colors">
@@ -198,8 +201,13 @@
                                             <span class="mx-4 font-bold text-xl min-w-[3rem] text-center" x-text="qty"></span>
                                             <button
                                                 @click="
-                                                    qty++;
-                                                    $nextTick(() => $dispatch('update-qty', {id: {{ $item->id }}, qty: qty}));
+                                                    if(qty < 10) {
+                                                        qty++;
+                                                        $nextTick(() => {
+                                                            $dispatch('update-qty', {id: {{ $item->id }}, qty: qty});
+                                                            calculateTotal();
+                                                        });
+                                                    }
                                                 "
                                                 class="w-10 h-10 bg-blue-200 hover:bg-blue-300 rounded-full flex items-center justify-center text-blue-700 font-bold transition-colors">
                                                 +
@@ -249,6 +257,7 @@
                                         placeholder="Wpisz kod rabatowy"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                         x-model="discountCode"
+                                        @input="calculateTotal()"
                                     />
                                     <div class="flex gap-2">
                                         <button
@@ -292,15 +301,17 @@
                                 @else
                                     <div class="space-y-2">
                                         @foreach ($userDiscounts as $discount)
-                                            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                                <div class="font-bold text-blue-800 text-sm">{{ $discount->code }}</div>
-                                                <div class="text-xs text-blue-600">
-                                                    {{ $discount->type === 'percentage' ? "-{$discount->value}%" : "-{$discount->value} zł" }}
-                                                    @if ($discount->expires_at)
-                                                        <br>Ważny do: {{ $discount->expires_at->format('d.m.Y') }}
-                                                    @endif
+                                            @if (!$discount->expires_at || $discount->expires_at->isFuture())
+                                                <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                                    <div class="font-bold text-blue-800 text-sm">{{ $discount->code }}</div>
+                                                    <div class="text-xs text-blue-600">
+                                                        {{ $discount->type === 'percentage' ? "-{$discount->value}%" : "-{$discount->value} zł" }}
+                                                        @if ($discount->expires_at)
+                                                            <br>Ważny do: {{ $discount->expires_at->format('d.m.Y') }}
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endif
                                         @endforeach
                                     </div>
                                 @endif
@@ -325,18 +336,15 @@
                                             <span class="font-medium">-{{ number_format($bulkDiscountAmount, 2) }} zł</span>
                                         </div>
                                     @endif
-                                    <div x-show="discountAmount > 0" x-transition class="flex justify-between text-purple-600">
+                                    <div x-show="discountCode" x-transition class="flex justify-between text-purple-600">
                                         <span>Kod rabatowy:</span>
                                         <span class="font-medium">-<span x-text="discountAmount"></span> zł</span>
                                     </div>
                                 </div>
-
                                 <div class="border-t mt-4 pt-4">
                                     <div class="flex justify-between items-center text-xl">
                                         <span class="font-bold text-gray-800">Razem do zapłaty:</span>
-                                        <span class="font-bold text-green-600" x-text="formattedTotal()">
-                                            {{ number_format($totalAfterBulk, 2) }} zł
-                                        </span>
+                                        <span class="font-bold text-green-600" x-text="formattedTotal()"></span>
                                     </div>
                                 </div>
                             </div>
@@ -447,6 +455,25 @@
                     Po wydaniu 10 000 zł otrzymasz stałą zniżkę -5%, a po przekroczeniu 15 000 zł -10% na każde zamówienie.<br>
                     <span class="italic text-blue-700">Funkcjonalność nie jest jeszcze dostępna – wprowadzimy ją w przyszłości.</span>
                 </div>
+
+                <!-- DODAJEMY ROZBUDOWANY OPIS KOLEJNOŚCI RABATÓW -->
+                <div class="mt-8 p-4 border rounded bg-blue-100 text-blue-900">
+                    <h4 class="font-bold mb-2">Jak są naliczane rabaty?</h4>
+                    <ol class="list-decimal list-inside space-y-1 text-sm">
+                        <li><strong>Najpierw</strong> sumowana jest cena wszystkich produktów za cały okres zamówienia.</li>
+                        <li><strong>Następnie</strong> odejmowane są darmowe produkty (4+1 gratis).</li>
+                        <li><strong>Później</strong> liczony jest rabat 10% (jeśli po 4+1 jest &ge; 2000 zł) lub 15% (jeśli po 4+1 jest &ge; 3000 zł).</li>
+                        <li><strong>Potem</strong> liczony jest rabat lojalnościowy 5% (jeśli masz 3 zamówienia w ostatnich 7 dniach).</li>
+                        <li><strong>Na końcu</strong> od tej kwoty liczony jest rabat z kodu rabatowego:<br>
+                            - <strong>procentowy</strong> (np. -19%)<br>
+                            - <strong>kwotowy</strong> (np. -147 zł, -153 zł)<br>
+                            Rabat z kodu jest zawsze liczony od kwoty po wszystkich powyższych rabatach.
+                        </li>
+                    </ol>
+                    <div class="mt-4 text-sm text-blue-800 border-t pt-3">
+                        <strong>Przykład:</strong> Jeśli masz kod rabatowy -19%, to rabat ten zostanie naliczony od kwoty po wszystkich innych promocjach (czyli po 4+1 gratis, rabacie 10%/15% i ewentualnym rabacie lojalnościowym).
+                    </div>
+                </div>
             </div>
         @endif
     </div>
@@ -471,6 +498,7 @@ function cartData() {
             this.calculateTotal();
             document.addEventListener('update-qty', async (e) => {
                 await this.updateQuantity(e.detail.id, e.detail.qty);
+                this.calculateTotal();
             });
         },
 
@@ -499,32 +527,32 @@ function cartData() {
                     }
                 }
             }
-            total -= free;
+            let afterFree = total - free;
 
-            // Apply bulk discount
-            if (total >= 3000) {
-                total *= 0.85;
-            } else if (total >= 2000) {
-                total *= 0.90;
+            // Bulk discount od afterFree
+            let bulkDiscountPercent = 0;
+            if (afterFree >= 3000) {
+                bulkDiscountPercent = 15;
+            } else if (afterFree >= 2000) {
+                bulkDiscountPercent = 10;
             }
+            let bulkDiscount = afterFree * (bulkDiscountPercent / 100);
+            let afterBulk = afterFree - bulkDiscount;
 
-            // Apply discount code
+            // Kod rabatowy od afterBulk
             let discount = 0;
             if (this.discountValue > 0 && this.discountType) {
                 if (this.discountType === 'percentage') {
-                    discount = total * (this.discountValue / 100);
+                    discount = afterBulk * (this.discountValue / 100);
                 } else if (this.discountType === 'fixed') {
-                    discount = Math.min(this.discountValue, total);
+                    discount = Math.min(this.discountValue, afterBulk);
                 }
-                total = Math.max(0, total - discount);
             }
-
             this.discountAmount = discount.toFixed(2);
-            this.total = total.toFixed(2);
+            this.total = (afterBulk - discount).toFixed(2);
         },
 
         formattedTotal() {
-            this.calculateTotal();
             return this.total + ' zł';
         },
 
@@ -554,34 +582,21 @@ function cartData() {
             }
         },
 
-        async removeItem(itemId) {
-            // Zamiast fetch, przekieruj na trasę usuwania (klasyczny redirect)
-            window.location.href = `/client/cart/remove/${itemId}`;
-        },
-
-        async clearCart() {
-            // NIE używaj JS do przekierowania ani fetch!
-            // Usuwamy tę funkcję, bo teraz działa klasyczny formularz.
-        },
-
         applyDiscount() {
             let code = this.discountCode.trim().toLowerCase();
             if (!code) {
                 this.showMessage("Wprowadź kod rabatowy!", "error");
                 return;
             }
-
             let discount = this.availableDiscounts.find(d => d.code === code);
             if (discount) {
                 this.discountValue = discount.value;
                 this.discountType = discount.type;
-
+                this.calculateTotal(); // <-- natychmiast przelicz rabat
                 const label = discount.type === 'percentage'
                     ? `-${discount.value}%`
                     : `-${discount.value.toFixed(2)} zł`;
-
                 this.showMessage(`✅ Kod rabatowy aktywowany! Rabat: ${label}`, "success");
-                this.calculateTotal();
             } else {
                 this.showMessage("❌ Nie znaleziono takiego kodu rabatowego lub jest nieaktywny.", "error");
                 this.discountCode = '';
@@ -602,23 +617,17 @@ function cartData() {
         },
 
         showMessage(message, type) {
-            // Create a temporary notification
             const notification = document.createElement('div');
             notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full ${
-                type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' :
-                type === 'error' ? 'bg-red-100 border border-red-400 text-red-700' :
-                'bg-blue-100 border border-blue-400 text-blue-700'
+                type === 'success' ? 'bg-green-100 border border-green-400 text-green-700'
+                : type === 'error' ? 'bg-red-100 border border-red-400 text-red-700'
+                : 'bg-blue-100 border border-blue-400 text-blue-700'
             }`;
             notification.textContent = message;
-
             document.body.appendChild(notification);
-
-            // Animate in
             setTimeout(() => {
                 notification.classList.remove('translate-x-full');
             }, 100);
-
-            // Remove after 3 seconds
             setTimeout(() => {
                 notification.classList.add('translate-x-full');
                 setTimeout(() => {

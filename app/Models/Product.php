@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -54,5 +55,12 @@ class Product extends Model
         return $this->hasActivePromotion() ? $this->promotion_price : $this->price;
     }
 
-
+    public function getImageUrlAttribute()
+    {
+        if ($this->image_path && \Storage::disk('public')->exists($this->image_path)) {
+            return asset('storage/' . $this->image_path);
+        }
+        // Użyj własnego domyślnego pliku (np. public/storage/products/default.png)
+        return asset('storage/products/default.png');
+    }
 }

@@ -131,31 +131,37 @@
                     </div>
 
                     {{-- 🗓 Kalendarz --}}
-                    <div class="md:w-[260px] mt-6 md:mt-0"
-                    x-data="calendarComponent('{{ $order->start_date->toDateString() }}', '{{ $order->end_date->toDateString() }}', '{{ $order->status }}', '{{ $order->cancellation->cancellation_date ?? '' }}')"
-                    x-init="init()">
-                    <div class="border p-4 rounded bg-white shadow-md">
-                        <div class="flex justify-between items-center mb-2">
-                            <button @click="prevMonth" class="text-xs px-2 py-1 border rounded hover:bg-gray-200">←</button>
-                            <h3 class="text-sm font-semibold text-gray-700 text-center"
-                                x-text="currentMonth.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })"></h3>
-                            <button @click="nextMonth" class="text-xs px-2 py-1 border rounded hover:bg-gray-200">→</button>
-                        </div>
+                    @if($order->start_date && $order->end_date)
+                        <div class="md:w-[260px] mt-6 md:mt-0"
+                            x-data="calendarComponent(
+                                '{{ $order->start_date->toDateString() }}',
+                                '{{ $order->end_date->toDateString() }}',
+                                '{{ $order->status }}',
+                                '{{ $order->cancellation->cancellation_date ?? '' }}'
+                            )"
+                            x-init="init()">
+                            <div class="border p-4 rounded bg-white shadow-md">
+                                <div class="flex justify-between items-center mb-2">
+                                    <button @click="prevMonth" class="text-xs px-2 py-1 border rounded hover:bg-gray-200">←</button>
+                                    <h3 class="text-sm font-semibold text-gray-700 text-center"
+                                        x-text="currentMonth.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })"></h3>
+                                    <button @click="nextMonth" class="text-xs px-2 py-1 border rounded hover:bg-gray-200">→</button>
+                                </div>
 
-                        <div class="grid grid-cols-7 text-[10px] text-center gap-0.5">
-                            <template x-for="day in days" :key="day.date">
-                                <div :class="day.classes" x-text="day.day"></div>
-                            </template>
-                        </div>
+                                <div class="grid grid-cols-7 text-[10px] text-center gap-0.5">
+                                    <template x-for="day in days" :key="day.date">
+                                        <div :class="day.classes" x-text="day.day"></div>
+                                    </template>
+                                </div>
 
-                        <div class="text-[10px] text-gray-600 mt-3 flex flex-wrap justify-center gap-4">
-                            <div><span class="inline-block w-3 h-3 bg-green-500 rounded mr-1 align-middle"></span> Ukończono</div>
-                            <div><span class="inline-block w-3 h-3 bg-yellow-400 rounded mr-1 align-middle"></span> W trakcie</div>
-                            <div><span class="inline-block w-3 h-3 bg-red-400 rounded mr-1 align-middle"></span> Przerwany</div>
+                                <div class="text-[10px] text-gray-600 mt-3 flex flex-wrap justify-center gap-4">
+                                    <div><span class="inline-block w-3 h-3 bg-green-500 rounded mr-1 align-middle"></span> Ukończono</div>
+                                    <div><span class="inline-block w-3 h-3 bg-yellow-400 rounded mr-1 align-middle"></span> W trakcie</div>
+                                    <div><span class="inline-block w-3 h-3 bg-red-400 rounded mr-1 align-middle"></span> Przerwany</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-
+                    @endif
                 </div>
             </div>
         @empty
@@ -307,34 +313,36 @@
                     </div>
 
                     {{-- 📅 Kalendarz --}}
-                    <div class="md:w-[260px] mt-6 md:mt-0"
-                        x-data="calendarComponent(
-                            '{{ $order->start_date->toDateString() }}',
-                            '{{ $order->end_date->toDateString() }}',
-                            '{{ $order->status }}',
-                            '{{ ($order->status === 'cancelled' && $order->cancellation) ? $order->cancellation->cancellation_date : '' }}'
-                        )"
-                        x-init="init()">
-                        <div class="border p-4 rounded bg-white shadow-md">
-                            <div class="flex justify-between items-center mb-2">
-                            <button @click="prevMonth" class="text-xs px-2 py-1 border rounded hover:bg-gray-200">←</button>
-                            <h3 class="text-sm font-semibold text-gray-700 text-center"
-                                x-text="currentMonth.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })"></h3>
-                            <button @click="nextMonth" class="text-xs px-2 py-1 border rounded hover:bg-gray-200">→</button>
+                    @if($order->start_date && $order->end_date)
+                        <div class="md:w-[260px] mt-6 md:mt-0"
+                            x-data="calendarComponent(
+                                '{{ $order->start_date->toDateString() }}',
+                                '{{ $order->end_date->toDateString() }}',
+                                '{{ $order->status }}',
+                                '{{ ($order->status === 'cancelled' && $order->cancellation) ? $order->cancellation->cancellation_date : '' }}'
+                            )"
+                            x-init="init()">
+                            <div class="border p-4 rounded bg-white shadow-md">
+                                <div class="flex justify-between items-center mb-2">
+                                    <button @click="prevMonth" class="text-xs px-2 py-1 border rounded hover:bg-gray-200">←</button>
+                                    <h3 class="text-sm font-semibold text-gray-700 text-center"
+                                        x-text="currentMonth.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })"></h3>
+                                    <button @click="nextMonth" class="text-xs px-2 py-1 border rounded hover:bg-gray-200">→</button>
+                                </div>
+                                <div class="grid grid-cols-7 text-[10px] text-center gap-0.5">
+                                    <template x-for="day in days" :key="day.date">
+                                        <div :class="day.classes" x-text="day.day"></div>
+                                    </template>
+                                </div>
+                                <div class="text-[10px] text-gray-600 mt-3 flex flex-wrap justify-center gap-4">
+                                    <div><span class="inline-block w-3 h-3 bg-green-500 rounded mr-1 align-middle"></span> Ukończono</div>
+                                    <div><span class="inline-block w-3 h-3 bg-yellow-400 rounded mr-1 align-middle"></span> W trakcie</div>
+                                    <div><span class="inline-block w-3 h-3 bg-red-400 rounded mr-1 align-middle"></span> Przerwany</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="grid grid-cols-7 text-[10px] text-center gap-0.5">
-                            <template x-for="day in days" :key="day.date">
-                                <div :class="day.classes" x-text="day.day"></div>
-                            </template>
-                        </div>
-                        <div class="text-[10px] text-gray-600 mt-3 flex flex-wrap justify-center gap-4">
-                            <div><span class="inline-block w-3 h-3 bg-green-500 rounded mr-1 align-middle"></span> Ukończono</div>
-                            <div><span class="inline-block w-3 h-3 bg-yellow-400 rounded mr-1 align-middle"></span> W trakcie</div>
-                            <div><span class="inline-block w-3 h-3 bg-red-400 rounded mr-1 align-middle"></span> Przerwany</div>
-                        </div>
-                    </div>
+                    @endif
                 </div>
-
             </div>
         @empty
             <p class="text-gray-500">Brak ukończonych zamówień.</p>

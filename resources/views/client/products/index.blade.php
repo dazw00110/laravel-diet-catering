@@ -3,7 +3,15 @@
 @section('title', 'Oferty cateringowe')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-8" x-data="{ showMessage: false }">
+<div class="max-w-7xl mx-auto px-4 py-8"
+     x-data="{ showToast: false, message: '', init() {
+        @if(session('success'))
+            this.message = @json(session('success'));
+            this.showToast = true;
+            setTimeout(() => this.showToast = false, 2500);
+        @endif
+     } }"
+     x-init="init()">
     <h1 class="text-3xl font-bold mb-6 text-center">🥗 Oferty cateringowe</h1>
 
     <form method="GET" class="bg-white p-6 rounded-xl shadow mb-8 flex flex-wrap gap-6 items-end justify-center">
@@ -61,7 +69,7 @@
                 <div class="relative flex-shrink-0">
                     <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden">
                         <img
-                            src="{{ $product->image_path ? asset('storage/' . $product->image_path) : asset('storage/products/default.png') }}"
+                            src="{{ $product->image_url }}"
                             alt="{{ $product->name }}"
                             class="object-contain w-full h-full"
                         />
@@ -91,9 +99,7 @@
                     </div>
                     <div class="flex-1"></div>
                     <div class="flex flex-col gap-2 mt-3">
-                        <form method="POST"
-                            action="{{ route('client.cart.add', $product) }}"
-                            x-data="{ added: false }"
+                        <form method="POST" action="{{ route('client.cart.add', $product) }}"
                             x-on:submit.prevent="
                                 fetch($el.action, {
                                     method: 'POST',
@@ -103,14 +109,26 @@
                                         'Accept': 'application/json'
                                     },
                                     body: JSON.stringify({ quantity: 1 })
-                                }).then(res => {
-                                    if (res.ok) {
-                                        added = true;
-                                        setTimeout(() => added = false, 3000);
+                                }).then(async res => {
+                                    let data = await res.json().catch(() => ({}));
+                                    if (res.ok && data.success) {
+                                        showToast = true;
+                                        message = data.message || 'Produkt dodano do koszyka.';
+                                    } else {
+                                        showToast = true;
+                                        message = data.message || 'Nie można dodać produktu do koszyka.';
                                     }
+                                    setTimeout(() => showToast = false, 2500);
+                                }).catch(() => {
+                                    showToast = true;
+                                    message = 'Błąd sieci!';
+                                    setTimeout(() => showToast = false, 2500);
                                 });
                             ">
-                            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold shadow">
+                            @csrf
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit"
+                                class="w-full bg-green-600 text-white py-2 mt-4 rounded-lg hover:bg-green-700 text-sm font-semibold shadow transition">
                                 ➕ Dodaj do koszyka
                             </button>
                         </form>
@@ -177,6 +195,15 @@
 
     <div class="mt-8 flex justify-center">
         {{ $products->withQueryString()->links() }}
+    </div>
+
+    <div x-show="showToast" x-transition
+         class="fixed bottom-6 right-6 bg-green-100 border-2 border-green-500 text-green-900 px-8 py-6 rounded-xl shadow-2xl z-50 flex items-center space-x-6 min-w-[340px] text-lg font-semibold"
+         style="font-size: 1.25rem;"
+         x-cloak>
+        <span class="text-2xl">✅</span>
+        <span x-text="message"></span>
+        <a href="{{ route('client.cart.index') }}" class="underline text-base font-bold ml-4">Przejdź do koszyka</a>
     </div>
 </div>
 @endsection
