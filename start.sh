@@ -29,6 +29,9 @@ if [ ! -f vendor/autoload.php ]; then
     exit 1
 fi
 
+echo "Tworzenie linku storage..."
+php artisan storage:link
+
 echo "Generowanie klucza aplikacji..."
 php artisan key:generate
 
@@ -43,8 +46,8 @@ else
 fi
 
 echo "Uruchamianie Vite i backendu Laravel..."
-gnome-terminal -- npm run dev &
-gnome-terminal -- php artisan serve &
+gnome-terminal -- bash -c "npm run dev; exec bash" &
+gnome-terminal -- bash -c "php artisan serve; exec bash" &
 
 echo "==============================================="
 echo "Wszystko gotowe! Odwiedz: http://127.0.0.1:8000"
