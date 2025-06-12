@@ -42,7 +42,6 @@ class Product extends Model
         return $this->hasMany(ProductReview::class);
     }
 
-
     public function hasActivePromotion()
     {
         return $this->promotion_price &&
@@ -57,12 +56,10 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
-        $filename = $this->image_path ? basename($this->image_path) : null;
-        $path = $filename ? 'products/' . $filename : 'products/default-product.png';
-
-        if (!file_exists(storage_path('app/public/' . $path))) {
-            $path = 'products/default-product.png';
+        if ($this->image_path && Storage::disk('public')->exists($this->image_path)) {
+            return asset('storage/' . ltrim($this->image_path, '/'));
         }
-        return asset('storage/' . $path);
+
+        return 'https://images.unsplash.com/vector-1738926381356-a78ac6592999?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
     }
 }

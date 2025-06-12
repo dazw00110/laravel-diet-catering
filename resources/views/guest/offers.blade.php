@@ -59,17 +59,14 @@
                 <div class="relative flex-shrink-0">
                     <div class="w-full aspect-[4/3] bg-white flex items-center justify-center overflow-hidden">
                         <img
-                            src="{{ $product->image_path ? asset('storage/' . $product->image_path) : asset('storage/products/default.png') }}"
-                            alt="{{ $product->name }}"
-                            class="object-contain w-full h-full"
-                        />
+                        src="{{ $product->image_url }}"
+                        onerror="this.onerror=null;this.src='https://images.unsplash.com/vector-1738926381356-a78ac6592999?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';"
+                        alt="{{ $product->name }}"
+                        class="object-contain w-full h-full"
+                    />
+
                     </div>
-                    @if($product->is_vegan)
-                        <span class="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded-full shadow">🌱 Wegańska</span>
-                    @endif
-                    @if($product->is_vegetarian)
-                        <span class="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full shadow">🥬 Wegetariańska</span>
-                    @endif
+
                 </div>
                 <div class="p-4 flex flex-col flex-grow">
                     <h2 class="font-bold text-lg mb-1">{{ $product->name }}</h2>

@@ -53,13 +53,13 @@
                 </p>
             </div>
 
-            <div class="relative mx-auto max-w-[1040px]"> {{-- 4 * 260px --}}
+            <div class="relative mx-auto max-w-[1040px]">
                 <button @click="prev"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full shadow px-3 py-1 text-lg hover:bg-gray-100">
+                        class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full shadow px-3 py-1 text-lg hover:bg-gray-100">
                     ←
                 </button>
                 <button @click="next"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full shadow px-3 py-1 text-lg hover:bg-gray-100">
+                        class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border rounded-full shadow px-3 py-1 text-lg hover:bg-gray-100">
                     →
                 </button>
 
@@ -72,14 +72,9 @@
                                 <div class="bg-white rounded-2xl shadow-lg p-4 flex flex-col justify-between h-full border border-gray-100 hover:shadow-xl transition-shadow duration-200">
                                     <div class="relative mb-3">
                                         <img src="{{ $product->image_url }}"
+                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/vector-1738926381356-a78ac6592999?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';"
                                              alt="{{ $product->name }}"
                                              class="w-full h-[160px] object-contain rounded-lg bg-gray-50" />
-                                        @if($product->is_vegan)
-                                            <span class="absolute top-2 left-2 bg-green-600 text-white text-xs px-2 py-1 rounded-full shadow">🌱 Wegańska</span>
-                                        @endif
-                                        @if($product->is_vegetarian)
-                                            <span class="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full shadow">🥬 Wegetariańska</span>
-                                        @endif
                                     </div>
                                     <div class="flex flex-col justify-between flex-1">
                                         <div>
@@ -96,8 +91,7 @@
                                             <div class="flex gap-2 mt-1 text-xs text-gray-700">
                                                 @if($product->is_vegan)
                                                     <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">🌱 Wegańska</span>
-                                                @endif
-                                                @if($product->is_vegetarian)
+                                                @elseif($product->is_vegetarian)
                                                     <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">🥬 Wegetariańska</span>
                                                 @endif
                                             </div>
@@ -118,35 +112,11 @@
                                         </div>
                                     </div>
                                     <form method="POST" action="{{ route('client.cart.add', $product) }}"
-                                        x-on:submit.prevent="
-                                            fetch($el.action, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                                    'Accept': 'application/json'
-                                                },
-                                                body: JSON.stringify({ quantity: 1 })
-                                            }).then(async res => {
-                                                let data = await res.json().catch(() => ({}));
-                                                if (res.ok && data.success) {
-                                                    showToast = true;
-                                                    message = data.message || 'Produkt dodano do koszyka.';
-                                                } else {
-                                                    showToast = true;
-                                                    message = data.message || 'Nie można dodać produktu do koszyka.';
-                                                }
-                                                setTimeout(() => showToast = false, 2500);
-                                            }).catch(() => {
-                                                showToast = true;
-                                                message = 'Błąd sieci!';
-                                                setTimeout(() => showToast = false, 2500);
-                                            });
-                                        ">
+                                          x-on:submit.prevent="/* Ajax */">
                                         @csrf
                                         <input type="hidden" name="quantity" value="1">
                                         <button type="submit"
-                                            class="w-full bg-green-600 text-white py-2 mt-4 rounded-lg hover:bg-green-700 text-sm font-semibold shadow transition">
+                                                class="w-full bg-green-600 text-white py-2 mt-4 rounded-lg hover:bg-green-700 text-sm font-semibold shadow transition">
                                             ➕ Dodaj do koszyka
                                         </button>
                                     </form>

@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 use Faker\Factory as Faker;
 
 class ProductSeeder extends Seeder
@@ -14,17 +12,7 @@ class ProductSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $defaultImagePath = 'products/default.png'; // docelowa ścieżka w storage/app/public
-        $localDefaultImage = base_path('resources/defaults/products/default-product.png');
-
-        // 🛡️ Bezpieczne kopiowanie domyślnego obrazka
-        if (!Storage::disk('public')->exists($defaultImagePath)) {
-            if (File::exists($localDefaultImage)) {
-                Storage::disk('public')->put($defaultImagePath, File::get($localDefaultImage));
-            } else {
-                echo "⚠️  Brakuje pliku: $localDefaultImage. Pomijam kopiowanie.\n";
-            }
-        }
+        $defaultImageUrl = 'https://images.unsplash.com/vector-1738926381356-a78ac6592999?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
         $adjectives = [
             // Styl życia / aktywność
@@ -60,7 +48,7 @@ class ProductSeeder extends Seeder
                 'is_active' => $faker->boolean(90),
                 'is_vegan' => $isVegan,
                 'is_vegetarian' => $isVegetarian,
-                'image_path' => $defaultImagePath,
+                'image_path' => $defaultImageUrl,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
