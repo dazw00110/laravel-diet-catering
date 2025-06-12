@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-3xl mx-auto p-6 bg-white shadow rounded space-y-8">
 
-    {{-- 🔔 Powiadomienie o sukcesie (rabat) --}}
+    !<-- Success Message -->
     @if (session('success'))
         <div
             x-data="{ show: true }"

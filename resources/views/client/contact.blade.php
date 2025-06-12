@@ -16,7 +16,7 @@
 
     <h1 class="text-3xl font-bold mb-6">Skontaktuj się z nami</h1>
 
-    {{-- DANE FIRMY --}}
+    <!-- Contact Information -->
     <div class="bg-gray-100 p-6 rounded-lg shadow mb-10 space-y-3 text-sm text-gray-700">
         <p><strong>📍 Adres:</strong> ul. Zdrowa 10, 00-123 Warszawa</p>
         <p><strong>🕒 Godziny pracy:</strong> Pon - Pt: 8:00 - 18:00</p>
@@ -25,7 +25,7 @@
         <p><strong>🧾 NIP:</strong> 123-456-78-90</p>
     </div>
 
-    {{-- FORMULARZ --}}
+    {{-- Form --}}
     <template x-if="!sent">
         <form @submit.prevent="handleSubmit" class="space-y-6">
             <div>

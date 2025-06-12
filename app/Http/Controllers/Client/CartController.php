@@ -88,7 +88,7 @@ class CartController extends Controller
     {
         $cart = Order::getOrCreateCartForUser(Auth::id());
 
-        // Obsługa AJAX PATCH (item_id, quantity)
+        // AJAX PATCH support (item_id, quantity)
         if ($request->has('item_id') && $request->has('quantity')) {
             $item = $cart->items()->find($request->input('item_id'));
             $qty = (int)$request->input('quantity');
@@ -96,18 +96,18 @@ class CartController extends Controller
                 $item->quantity = $qty;
                 $item->save();
             }
-            // Jeśli ilość = 0, usuń produkt
+            // If quantity = 0, remove the product
             if ($item && $qty == 0) {
                 $item->delete();
             }
             $cart->total_price = $cart->items->sum(fn($i) => $i->quantity * $i->unit_price);
             $cart->save();
 
-            // Odpowiedź JSON dla AJAX
+            // JSON response for AJAX
             return response()->json(['success' => true]);
         }
 
-        // Obsługa klasycznych przycisków (zwiększ/zmniejsz)
+        // Classic button support (increase/decrease)
         if ($request->has('increase')) {
             $item = $cart->items()->find($request->input('increase'));
             if ($item && $item->quantity < 10) {
@@ -212,7 +212,7 @@ class CartController extends Controller
                 ->first();
 
             if ($discount) {
-                // Rabat z kodu liczony od kwoty po wszystkich innych rabatach
+                // Code discount calculated from the amount after all other discounts
                 if ($discount->type === 'percentage') {
                     $discountSavings = $totalAfterLoyalty * ($discount->value / 100);
                 } elseif ($discount->type === 'fixed') {
@@ -278,7 +278,7 @@ class CartController extends Controller
 
         $cart = Order::getOrCreateCartForUser($userId);
 
-        // Dodaj produkty
+        // Add products
         foreach ($order->items as $item) {
             $cartItem = $cart->items()->firstOrNew([
                 'product_id' => $item->product_id,
@@ -289,7 +289,7 @@ class CartController extends Controller
             $cartItem->save();
         }
 
-        // Skopiuj dane adresowe z poprzedniego zamówienia do koszyka
+        // Copy address details from previous order to cart
         $cart->city = $order->city;
         $cart->postal_code = $order->postal_code;
         $cart->street = $order->street;

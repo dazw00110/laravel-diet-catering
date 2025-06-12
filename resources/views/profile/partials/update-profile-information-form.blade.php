@@ -12,7 +12,7 @@
         @csrf
         @method('put')
 
-        {{-- Imię --}}
+        {{-- Name --}}
         <div>
             <x-input-label for="first_name" :value="'Imię'" />
             <x-text-input id="first_name" name="first_name" type="text" class="mt-1 block w-full"
@@ -20,7 +20,7 @@
             <x-input-error class="mt-2" :messages="$errors->get('first_name')" />
         </div>
 
-        {{-- Nazwisko --}}
+        {{-- Forname --}}
         <div>
             <x-input-label for="last_name" :value="'Nazwisko'" />
             <x-text-input id="last_name" name="last_name" type="text" class="mt-1 block w-full"
@@ -45,14 +45,14 @@
     @endif
 
 
-        {{-- Rola (podgląd) --}}
+        {{-- Role --}}
         <div>
             <x-input-label for="role" :value="'Rola użytkownika'" />
             <x-text-input id="role" type="text" class="mt-1 block w-full bg-gray-100 cursor-not-allowed"
                 :value="ucfirst($user->userType->name)" disabled />
         </div>
 
-        {{-- Preferencje żywieniowe --}}
+        {{-- Eating Preferences --}}
         <div class="flex gap-4">
             <label><input type="checkbox" name="is_vegetarian" value="1" {{ old('is_vegetarian', $user->is_vegetarian) ? 'checked' : '' }}> Wegetarianin</label>
             <label><input type="checkbox" name="is_vegan" value="1" {{ old('is_vegan', $user->is_vegan) ? 'checked' : '' }}> Weganin</label>

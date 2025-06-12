@@ -50,6 +50,8 @@
         @else
             @php
                 $days = max($cart->start_date->diffInDays($cart->end_date) + 1, 7);
+                $maxCateringDays = 60;
+                $maxEndDate = $cart->start_date->copy()->addDays($maxCateringDays - 1);
                 $totalBeforeDiscounts = 0;
                 $promotionsApplied = [];
 
@@ -97,6 +99,18 @@
                             📅 Czas trwania cateringu
                         </h3>
                         <p class="text-gray-600 mb-4">Wybierz daty rozpoczęcia i zakończenia cateringu</p>
+                        <div class="mb-4 p-3 bg-yellow-50 border border-yellow-300 text-yellow-800 rounded-lg flex items-center gap-2">
+                            <span>ℹ️</span>
+                            Maksymalny czas trwania cateringu to <strong>60 dni</strong>.
+                        </div>
+
+                        <!-- Date Validation -->
+                        @if ($days > $maxCateringDays)
+                            <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg font-semibold flex items-center gap-2">
+                                <span>❗</span>
+                                Maksymalny czas trwania cateringu to 60 dni. Proszę wybrać krótszy okres.
+                            </div>
+                        @endif
                         <form method="POST" action="{{ route('client.cart.updateDates') }}"
                               class="grid grid-cols-1 md:grid-cols-2 gap-6"
                               x-data x-on:change.debounce.500ms="$el.submit()">
@@ -119,10 +133,17 @@
                                         let endInput = document.getElementById('end_date');
                                         let minEnd = new Date(start);
                                         minEnd.setDate(minEnd.getDate() + 7);
+                                        let maxEnd = new Date(start);
+                                        maxEnd.setDate(maxEnd.getDate() + 59);
                                         let minDateStr = minEnd.toISOString().split('T')[0];
+                                        let maxDateStr = maxEnd.toISOString().split('T')[0];
                                         endInput.min = minDateStr;
+                                        endInput.max = maxDateStr;
                                         if(endInput.value < minDateStr) {
                                             endInput.value = minDateStr;
+                                        }
+                                        if(endInput.value > maxDateStr) {
+                                            endInput.value = maxDateStr;
                                         }
                                     "
                                 >
@@ -137,7 +158,7 @@
                                     name="end_date"
                                     value="{{ $cart->end_date->format('Y-m-d') }}"
                                     min="{{ $cart->start_date->copy()->addDays(6)->format('Y-m-d') }}"
-                                    max="{{ now()->addYear()->format('Y-m-d') }}"
+                                    max="{{ $maxEndDate->format('Y-m-d') }}"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                                 >
                             </div>
@@ -146,6 +167,9 @@
                             <p class="text-blue-800 font-medium">
                                 📊 Czas trwania cateringu: <strong>{{ $days }} dni</strong>
                             </p>
+                            @if ($days > $maxCateringDays)
+                                <p class="text-red-700 font-bold mt-2">Maksymalny czas trwania cateringu to 60 dni!</p>
+                            @endif
                         </div>
                     </div>
 
@@ -440,7 +464,7 @@
                 </div>
             </div>
 
-            <!-- Rabaty info -->
+            <!-- discounts and promotions section -->
             <div class="mt-8 p-4 border rounded bg-blue-50 text-blue-900">
                 <h4 class="font-bold mb-2">Jak możesz uzyskać rabaty?</h4>
                 <ul class="list-disc list-inside space-y-1 text-sm">
@@ -456,7 +480,7 @@
                     <span class="italic text-blue-700">Funkcjonalność nie jest jeszcze dostępna – wprowadzimy ją w przyszłości.</span>
                 </div>
 
-                <!-- DODAJEMY ROZBUDOWANY OPIS KOLEJNOŚCI RABATÓW -->
+                <!-- How discounts are calculated -->
                 <div class="mt-8 p-4 border rounded bg-blue-100 text-blue-900">
                     <h4 class="font-bold mb-2">Jak są naliczane rabaty?</h4>
                     <ol class="list-decimal list-inside space-y-1 text-sm">
@@ -493,6 +517,7 @@ function cartData() {
             'value' => $d->value,
             'type' => $d->type
         ])),
+        maxCateringDays: 60,
 
         init() {
             this.calculateTotal();
@@ -539,7 +564,7 @@ function cartData() {
             let bulkDiscount = afterFree * (bulkDiscountPercent / 100);
             let afterBulk = afterFree - bulkDiscount;
 
-            // Kod rabatowy od afterBulk
+            // Discount code from afterBulk
             let discount = 0;
             if (this.discountValue > 0 && this.discountType) {
                 if (this.discountType === 'percentage') {
@@ -550,6 +575,14 @@ function cartData() {
             }
             this.discountAmount = discount.toFixed(2);
             this.total = (afterBulk - discount).toFixed(2);
+
+            // JS lock: if days > 60, show an alert and do not count further
+            if (days > this.maxCateringDays) {
+                this.total = '0.00';
+                this.discountAmount = '0.00';
+                this.showMessage('Maksymalny czas trwania cateringu to 60 dni!', 'error');
+                return;
+            }
         },
 
         formattedTotal() {

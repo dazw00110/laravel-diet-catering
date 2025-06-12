@@ -6,7 +6,7 @@
 <div class="max-w-5xl mx-auto p-6 bg-white shadow rounded space-y-10">
     <h1 class="text-2xl font-bold mb-4">📦 Moje zamówienia</h1>
 
-    {{-- 🔎 Filtrowanie i sortowanie --}}
+    {{-- Sort and filter form --}}
     <form method="GET" class="mb-6 flex flex-wrap gap-4 items-end bg-gray-50 p-4 rounded">
         <div>
             <label class="block text-sm font-medium">ID zamówienia</label>
@@ -38,7 +38,7 @@
         </div>
     </form>
 
-    {{-- 🔁 Zamówienia w realizacji --}}
+    {{-- Order lists --}}
     <section>
         <h2 class="text-xl font-semibold mb-2">🕒 W realizacji</h2>
 
@@ -71,7 +71,7 @@
                             <p><strong>Kod rabatowy:</strong> {{ $order->discount_code }}</p>
                         @endif
 
-                        {{-- Zastosowane zniżki/promocje --}}
+                        <!-- Applied discounts/promotions -->
                         <div class="mt-2">
                             <strong>Zastosowane zniżki/promocje:</strong>
                             <ul class="list-disc list-inside text-sm ml-4">
@@ -130,7 +130,7 @@
                         </form>
                     </div>
 
-                    {{-- 🗓 Kalendarz --}}
+                    {{-- Calendar --}}
                     @if($order->start_date && $order->end_date)
                         <div class="md:w-[260px] mt-6 md:mt-0"
                             x-data="calendarComponent(
@@ -169,7 +169,7 @@
         @endforelse
     </section>
 
-    {{-- ✅ Ukończone i anulowane --}}
+    {{-- Completed and cancelled orders --}}
     <section>
         <h2 class="text-xl font-semibold mb-2">✅ Ukończone i przerwane</h2>
 
@@ -228,7 +228,7 @@
                             <p><strong>Kod rabatowy:</strong> {{ $order->discount_code }}</p>
                         @endif
 
-                        {{-- Zastosowane zniżki/promocje --}}
+                        <!-- Applied discounts/promotions -->
                         <div class="mt-2">
                             <strong>Zastosowane zniżki/promocje:</strong>
                             <ul class="list-disc list-inside text-sm ml-4">
@@ -279,7 +279,7 @@
                             </ul>
                         </div>
 
-                        {{-- 🟩 PRZYCISKI --}}
+                        {{-- Buttons --}}
                         <div class="flex flex-wrap gap-3 pt-2">
                             <form action="{{ route('client.orders.repeat', $order) }}" method="POST">
                                 @csrf
@@ -312,7 +312,7 @@
                         </div>
                     </div>
 
-                    {{-- 📅 Kalendarz --}}
+                    {{-- Calendar --}}
                     @if($order->start_date && $order->end_date)
                         <div class="md:w-[260px] mt-6 md:mt-0"
                             x-data="calendarComponent(

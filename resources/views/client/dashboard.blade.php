@@ -5,7 +5,6 @@
 @section('content')
 
 <div>
-    <!-- 🔥 HERO -->
     <section class="relative h-[420px] md:h-[500px] bg-cover bg-center text-white rounded-b-3xl shadow-lg overflow-hidden"
              style="background-image: url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=2070&auto=format&fit=crop');">
         <div class="absolute inset-0 bg-gradient-to-b from-black/60 to-black/30 flex flex-col items-center justify-center">
@@ -16,7 +15,6 @@
         </div>
     </section>
 
-    <!-- ✨ KARUZELA -->
     <section class="py-16 bg-gray-50"
         x-data="{
             start: 0,
@@ -72,7 +70,7 @@
                                 <div class="bg-white rounded-2xl shadow-lg p-4 flex flex-col justify-between h-full border border-gray-100 hover:shadow-xl transition-shadow duration-200">
                                     <div class="relative mb-3">
                                         <img src="{{ $product->image_url }}"
-                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/vector-1738926381356-a78ac6592999?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';"
+                                             onerror="this.onerror=null;this.src='https://images.unsplash.com/vector-1738926381356-a78ac6592999?q=80&w=1160&auto=format&fit=crop';"
                                              alt="{{ $product->name }}"
                                              class="w-full h-[160px] object-contain rounded-lg bg-gray-50" />
                                     </div>
@@ -112,7 +110,31 @@
                                         </div>
                                     </div>
                                     <form method="POST" action="{{ route('client.cart.add', $product) }}"
-                                          x-on:submit.prevent="/* Ajax */">
+                                          x-on:submit.prevent="
+                                        fetch($el.action, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                'Accept': 'application/json'
+                                            },
+                                            body: JSON.stringify({ quantity: 1 })
+                                        }).then(async res => {
+                                            let data = await res.json().catch(() => ({}));
+                                            if (res.ok && data.success) {
+                                                showToast = true;
+                                                message = data.message || 'Produkt dodano do koszyka.';
+                                            } else {
+                                                showToast = true;
+                                                message = data.message || 'Nie można dodać produktu do koszyka.';
+                                            }
+                                            setTimeout(() => showToast = false, 2500);
+                                        }).catch(() => {
+                                            showToast = true;
+                                            message = 'Błąd sieci!';
+                                            setTimeout(() => showToast = false, 2500);
+                                        });
+                                      ">
                                         @csrf
                                         <input type="hidden" name="quantity" value="1">
                                         <button type="submit"
@@ -133,15 +155,16 @@
                     Zobacz naszą pełną ofertę
                 </a>
             </div>
-        </div>
 
-        <div x-show="showToast" x-transition
-             class="fixed bottom-6 right-6 bg-green-100 border-2 border-green-500 text-green-900 px-8 py-6 rounded-xl shadow-2xl z-50 flex items-center space-x-6 min-w-[340px] text-lg font-semibold"
-             style="font-size: 1.25rem;"
-             x-cloak>
-            <span class="text-2xl">✅</span>
-            <span x-text="message"></span>
-            <a href="{{ route('client.cart.index') }}" class="underline text-base font-bold ml-4">Przejdź do koszyka</a>
+            <div x-show="showToast" x-transition
+                 class="fixed bottom-6 right-6 bg-green-100 border-2 border-green-500 text-green-900 px-8 py-6 rounded-xl shadow-2xl z-50 flex items-center space-x-6 min-w-[340px] text-lg font-semibold"
+                 style="font-size: 1.25rem;"
+                 x-cloak>
+                <span class="text-2xl">✅</span>
+                <span x-text="message"></span>
+                <a href="{{ route('client.cart.index') }}" class="underline text-base font-bold ml-4">Przejdź do koszyka</a>
+            </div>
+
         </div>
     </section>
 

@@ -16,7 +16,7 @@ class ClientOrderController extends Controller
     {
         $user = auth()->user();
 
-        // Filtrowanie i sortowanie
+        // Filtering and sorting
         $queryActive = Order::with(['items.product'])
             ->where('user_id', $user->id)
             ->where('status', 'in_progress');
@@ -24,18 +24,18 @@ class ClientOrderController extends Controller
             ->where('user_id', $user->id)
             ->whereIn('status', ['completed', 'cancelled']);
 
-        // Filtrowanie po ID
+        // Filtering by ID
         if (request('order_id')) {
             $queryActive->where('id', request('order_id'));
             $queryCompleted->where('id', request('order_id'));
         }
-        // Filtrowanie po statusie
+        // Filter by status
         if (request('status')) {
             $queryActive->where('status', request('status'));
             $queryCompleted->where('status', request('status'));
         }
 
-        // Sortowanie
+        // Sort
         $sort = request('sort', 'id_desc');
         $sortMap = [
             'id_desc' => ['id', 'desc'],
@@ -112,13 +112,13 @@ class ClientOrderController extends Controller
             $cartItem->save();
         }
 
-        // Kopiuj adres z poprzedniego zamówienia
+        //Copy address from previous order
         $cart->city = $order->city;
         $cart->postal_code = $order->postal_code;
         $cart->street = $order->street;
         $cart->apartment_number = $order->apartment_number;
 
-        // Ustaw nową datę rozpoczęcia na dziś, a zakończenia na dziś + tyle dni ile trwało poprzednie zamówienie (włącznie z obiema datami)
+        // Set the new start date to today and end date to today + the number of days the previous order lasted (including both dates)
         $duration = $order->start_date->diffInDays($order->end_date) + 1;
         $cart->start_date = now()->toDateString();
         $cart->end_date = now()->copy()->addDays($duration - 1)->toDateString();

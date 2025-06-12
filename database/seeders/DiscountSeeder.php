@@ -13,11 +13,11 @@ class DiscountSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // Wyczyść tabele
+        // Clear tables
         DB::table('discount_user')->truncate();
         DB::table('discounts')->truncate();
 
-        // Stwórz 10 zniżek
+        // Create 10 discounts
         $discountIds = [];
         foreach (range(1, 10) as $i) {
             $type = $faker->randomElement(['percentage', 'fixed']);
@@ -34,7 +34,7 @@ class DiscountSeeder extends Seeder
             ]);
         }
 
-        // Przypisz po 3 losowe zniżki do każdego użytkownika
+        // Assign 3 random discounts to each user
         $users = DB::table('users')->pluck('id');
         foreach ($users as $userId) {
             foreach (collect($discountIds)->random(3) as $discountId) {

@@ -123,7 +123,7 @@
             <p class="col-span-full text-gray-600">Brak wyników dla wybranych filtrów.</p>
         @endforelse
 
-        {{-- MODAL Z OPINIAMI --}}
+        <!-- Modal for product reviews -->
         <template x-if="showModal">
             <div
                 x-show="showModal"
