@@ -9,7 +9,7 @@ class Cancellation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'reason', 'discount_id'];
+    protected $fillable = ['order_id', 'reason', 'discount_id', 'cancellation_date'];
 
     public function order()
     {

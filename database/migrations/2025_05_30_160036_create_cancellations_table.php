@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->text('reason');
+            $table->date('cancellation_date')->nullable();
             $table->foreignId('discount_id')->nullable()->constrained('discounts');
             $table->timestamps();
         });

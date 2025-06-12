@@ -27,7 +27,7 @@
 <div class="max-w-6xl mx-auto bg-white shadow-md p-6 rounded space-y-6 print-section">
     <h1 class="text-2xl font-bold mb-4">📊 Statystyki sprzedaży (Pracownik)</h1>
 
-    {{-- 🔍 FILTR --}}
+    {{-- Filter --}}
     <div x-data="{ loading: false }" class="bg-gray-100 p-4 rounded">
         <form @change="loading = true; $event.target.form.submit()" method="GET">
             <div class="flex flex-col md:flex-row gap-4 items-center">
@@ -71,7 +71,7 @@
         <li>Średnia cena: {{ number_format($averageValue, 2, ',', ' ') }} zł (poprzednio: {{ number_format($previousAverageValue, 2, ',', ' ') }} zł)</li>
     </ul>
 
-    {{-- 🏆 TOP 5 wg wydanej kwoty --}}
+    {{-- TOP 5 according to the amount spent --}}
     <h2 class="font-semibold text-lg mt-6">🏅 Top 5 klientów wg wydanej kwoty</h2>
     <table class="table-auto w-full border text-sm">
         <thead class="bg-gray-100">
@@ -92,7 +92,7 @@
         </tbody>
     </table>
 
-    {{-- 🛍️ TOP 5 wg liczby zamówień --}}
+    {{-- TOP 5 by number of orders --}}
     <h2 class="font-semibold text-lg mt-6">🧾 Top 5 klientów wg liczby zamówień</h2>
     <table class="table-auto w-full border text-sm">
         <thead class="bg-gray-100">
@@ -113,7 +113,7 @@
         </tbody>
     </table>
 
-    {{-- 🍽️ Najczęściej zamawiane produkty --}}
+    {{-- Most frequently ordered product --}}
     <h2 class="font-semibold text-lg mt-6">🍽️ Najczęściej zamawiane produkty</h2>
     <table class="table-auto w-full border text-sm">
         <thead class="bg-gray-100">
@@ -134,7 +134,7 @@
         </tbody>
     </table>
 
-    {{-- 💎 Najdroższe zamówienia --}}
+    {{-- Most expensive orders --}}
     <h2 class="font-semibold text-lg mt-6">💎 Najdroższe zamówienia</h2>
     <table class="table-auto w-full border text-sm">
         <thead class="bg-gray-100">
@@ -157,7 +157,7 @@
         </tbody>
     </table>
 
-    {{-- 📊 Wykresy --}}
+    {{-- Charts --}}
     <h2 class="font-semibold text-lg mt-6">📊 Wydatki – Top 5 klientów</h2>
     <canvas id="clientChart" height="100"></canvas>
 

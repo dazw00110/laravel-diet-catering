@@ -22,8 +22,8 @@
         <p><strong>Email:</strong> {{ $order->user->email }}</p>
 
         <h3 class="text-xl font-semibold mt-6 mb-2">🗓️ Okres realizacji</h3>
-        <p><strong>Data rozpoczęcia:</strong> {{ $order->start_date->format('d.m.Y') }}</p>
-        <p><strong>Data zakończenia:</strong> {{ $order->end_date->format('d.m.Y') }}</p>
+        <p><strong>Data rozpoczęcia:</strong> {{ $order->start_date->format('Y-m-d') }}</p>
+        <p><strong>Data zakończenia:</strong> {{ $order->end_date->format('Y-m-d') }}</p>
         <p><strong>Liczba dni cateringu:</strong> {{ $days }}</p>
         <p><strong>Status:</strong> {{ $statuses[$order->status] ?? $order->status }}</p>
 

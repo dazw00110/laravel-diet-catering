@@ -17,7 +17,12 @@
         <p class="text-gray-600 mt-2">Zarządzaj zamówieniami, analizuj sprzedaż i edytuj oferty cateringowe</p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <a href="{{ route('staff.users.index') }}" class="group bg-gradient-to-tr from-pink-100 to-pink-200 p-6 rounded-2xl shadow hover:scale-105 transition duration-200">
+            <div class="text-4xl mb-3">👥</div>
+            <h2 class="text-lg font-semibold text-gray-800 group-hover:underline">Użytkownicy</h2>
+            <p class="text-sm text-gray-700">Przeglądaj i edytuj konta użytkowników.</p>
+        </a>
         <a href="{{ route('staff.orders.index') }}" class="group bg-gradient-to-tr from-blue-100 to-blue-200 p-6 rounded-2xl shadow hover:scale-105 transition duration-200">
             <div class="text-4xl mb-3">📦</div>
             <h2 class="text-lg font-semibold text-gray-800 group-hover:underline">Zamówienia</h2>

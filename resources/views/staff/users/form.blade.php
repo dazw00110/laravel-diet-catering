@@ -1,4 +1,4 @@
-{{-- Imię --}}
+{{-- Name --}}
 <div>
     <label class="block mb-1 text-sm font-medium">Imię</label>
     <input type="text" name="first_name" value="{{ old('first_name', $user->first_name ?? '') }}" required
@@ -8,7 +8,7 @@
     @enderror
 </div>
 
-{{-- Nazwisko --}}
+{{-- Surname --}}
 <div>
     <label class="block mb-1 text-sm font-medium">Nazwisko</label>
     <input type="text" name="last_name" value="{{ old('last_name', $user->last_name ?? '') }}" required
@@ -18,7 +18,7 @@
     @enderror
 </div>
 
-{{-- Preferencje --}}
+{{-- Prefferences --}}
 <div class="flex items-center gap-6">
     <label class="flex items-center gap-2">
         <input type="checkbox" name="is_vegetarian" value="1" {{ old('is_vegetarian', $user->is_vegetarian ?? false) ? 'checked' : '' }} class="rounded">
@@ -31,7 +31,7 @@
     </label>
 </div>
 
-{{-- Hasło (opcjonalnie przy edycji) --}}
+{{-- Password--}}
 @if (isset($user))
 <div>
     <label class="block mb-1 text-sm font-medium">Nowe hasło (opcjonalne)</label>

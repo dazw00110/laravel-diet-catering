@@ -29,11 +29,6 @@ class Order extends Model
         'cancelled_at' => 'datetime',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONS
-    |--------------------------------------------------------------------------
-    */
 
     public function user()
     {
@@ -87,10 +82,20 @@ class Order extends Model
     public function hasReviews(): bool
     {
         foreach ($this->items as $item) {
-            if (!$item->product->reviews()->where('user_id', $this->user_id)->exists()) {
-                return false;
-            }
+            $product = $item->product;
+            if (!$product) continue;
+
+            $alreadyReviewed = ProductReview::where('user_id', $this->user_id)
+                ->where('product_id', $product->id)
+                ->exists();
+
+            if (!$alreadyReviewed) return false;
         }
         return true;
     }
+
+
+
+
+
 }

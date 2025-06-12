@@ -69,112 +69,48 @@
     <a href="{{ route('staff.orders.create') }}" class="bg-green-500 text-white px-4 py-2 rounded">Dodaj zamówienie</a>
 </div>
 
-<table class="min-w-full bg-white shadow rounded">
-    <thead>
+<table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
         <tr>
-            @php
-                $sort = request('sort');
-                $dir = request('dir') === 'desc' ? 'asc' : 'desc';
-
-                function generate_sort_url($field) {
-                    $currentSort = request('sort');
-                    $currentDir = request('dir') === 'desc' ? 'desc' : 'asc';
-                    $nextDir = ($currentSort === $field && $currentDir === 'asc') ? 'desc' : 'asc';
-                    return request()->fullUrlWithQuery(['sort' => $field, 'dir' => $nextDir]);
-                }
-
-                function sort_icon($field) {
-                    $currentSort = request('sort');
-                    $currentDir = request('dir') === 'desc' ? 'desc' : 'asc';
-                    if ($currentSort === $field) {
-                        return $currentDir === 'desc' ? '↓' : '↑';
-                    }
-                    return '';
-                }
-            @endphp
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('id') }}" class="hover:underline">ID {{ sort_icon('id') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('client') }}" class="hover:underline">Klient {{ sort_icon('client') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('total_price') }}" class="hover:underline">Cena {{ sort_icon('total_price') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('status') }}" class="hover:underline">Status {{ sort_icon('status') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('start_date') }}" class="hover:underline">Start {{ sort_icon('start_date') }}</a></th>
-            <th class="p-2 border-b text-center"><a href="{{ generate_sort_url('end_date') }}" class="hover:underline">Koniec {{ sort_icon('end_date') }}</a></th>
-            <th class="p-2 border-b text-center">Lokalizacja</th>
-            <th class="p-2 border-b text-center">Akcje</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Klient</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Start</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Koniec</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Kwota</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Akcje</th>
         </tr>
     </thead>
-    <tbody>
-        @forelse ($orders as $order)
-            @php
-                $labels = [
-                    'unordered' => ['W koszyku', 'bg-blue-100 text-blue-800'],
-                    'in_progress' => ['W trakcie', 'bg-yellow-100 text-yellow-800'],
-                    'completed' => ['Zakończono', 'bg-green-100 text-green-800'],
-                    'cancelled' => ['Anulowano', 'bg-red-100 text-red-800'],
-                ];
-                [$label, $class] = $labels[$order->status] ?? [$order->status, 'bg-gray-100 text-gray-800'];
-
-                $city = $order->city ?? '';
-                $street = $order->street ?? '';
-                $apartment = $order->apartment_number ?? '';
-                $location = trim("{$city}, {$street} {$apartment}");
-                if (empty(trim($location, ', '))) $location = 'Brak';
-            @endphp
+    <tbody class="bg-white divide-y divide-gray-200">
+        @foreach($orders as $order)
             <tr>
-                <td class="p-2 border-b text-center">{{ $order->id }}</td>
-                <td class="p-2 border-b text-center">{{ $order->user->first_name }} {{ $order->user->last_name }}</td>
-                <td class="p-2 border-b text-center">{{ number_format($order->total_price, 2) }} zł</td>
-                <td class="p-2 border-b text-center">
-                    <span class="px-2 py-1 rounded text-sm font-medium {{ $class }}">{{ $label }}</span>
-                </td>
-                <td class="p-2 border-b text-center">{{ $order->start_date }}</td>
-                <td class="p-2 border-b text-center">{{ $order->end_date }}</td>
-                <td class="p-2 border-b text-center">{{ $location }}</td>
-                <td class="p-2 border-b text-center space-y-1 space-x-1">
-                    <a href="{{ route('staff.orders.show', $order) }}" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">Pokaż</a>
-                    <a href="{{ route('staff.orders.edit', $order) }}" class="bg-yellow-400 text-white px-2 py-1 rounded text-sm hover:bg-yellow-500">Edytuj</a>
-
-                    <form action="{{ route('staff.orders.destroy', $order) }}" method="POST" class="inline">
-                        @csrf @method('DELETE')
-                        <button onclick="return confirm('Na pewno?')" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">Usuń</button>
-                    </form>
-
-                    <form action="{{ route('staff.orders.cancel', $order) }}" method="POST" class="inline">
-                        @csrf
-                        <button
-                            @if ($order->status === 'in_progress')
-                                onclick="return confirm('Czy na pewno anulować to zamówienie?')"
-                                class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-sm"
-                            @else
-                                disabled
-                                title="Można anulować tylko zamówienia w trakcie"
-                                class="bg-gray-300 text-white px-2 py-1 rounded text-sm opacity-50 cursor-not-allowed"
-                            @endif
-                        >
-                            Anuluj
-                        </button>
-                    </form>
-
-                    <form action="{{ route('staff.orders.complete', $order) }}" method="POST" class="inline">
-                        @csrf
-                        <button
-                            @if ($order->status !== 'in_progress')
-                                disabled
-                                title="Można zakończyć tylko zamówienia w trakcie"
-                                class="bg-gray-300 text-white px-2 py-1 rounded text-sm opacity-50 cursor-not-allowed"
-                            @else
-                                onclick="return confirm('Oznaczyć zamówienie jako zakończone?')"
-                                class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-sm"
-                            @endif
-                        >
-                            Zakończ
-                        </button>
-                    </form>
-
+                <td class="px-4 py-2">{{ $order->id }}</td>
+                <td class="px-4 py-2">{{ $order->user->first_name }} {{ $order->user->last_name }}</td>
+                <td class="px-4 py-2">{{ $statuses[$order->status] ?? $order->status }}</td>
+                <td class="px-4 py-2">{{ \Carbon\Carbon::parse($order->start_date)->format('Y-m-d') }}</td>
+                <td class="px-4 py-2">{{ \Carbon\Carbon::parse($order->end_date)->format('Y-m-d') }}</td>
+                <td class="px-4 py-2">{{ number_format($order->total_price, 2, ',', ' ') }} zł</td>
+                <td class="px-4 py-2">
+                    <div class="flex flex-wrap gap-2">
+                        <a href="{{ route('staff.orders.show', $order->id) }}" class="bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs hover:bg-gray-300">Szczegóły</a>
+                        <a href="{{ route('staff.orders.edit', $order->id) }}" class="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700">Edytuj</a>
+                        <form method="POST" action="{{ route('staff.orders.destroy', $order->id) }}" class="inline" onsubmit="return confirm('Na pewno usunąć zamówienie?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Usuń</button>
+                        </form>
+                        <form method="POST" action="{{ route('staff.orders.complete', $order->id) }}" class="inline">
+                            @csrf
+                            <button type="submit" class="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700">Zakończ</button>
+                        </form>
+                        <form method="POST" action="{{ route('staff.orders.cancel', $order->id) }}" class="inline">
+                            @csrf
+                            <button type="submit" class="bg-yellow-500 text-white px-2 py-1 rounded text-xs hover:bg-yellow-600">Przerwij</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
-        @empty
-            <tr><td colspan="8" class="p-4 text-center text-gray-500">Brak wyników</td></tr>
-        @endforelse
+        @endforeach
     </tbody>
 </table>
 

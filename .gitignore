@@ -41,3 +41,7 @@ yarn-error.log*
 # System
 .DS_Store
 Thumbs.db
+
+# Produkty - wrzucaj tylko default.png, reszta ignorowana
+/storage/app/public/products/*
+!/storage/app/public/products/default.png

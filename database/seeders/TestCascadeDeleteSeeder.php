@@ -67,7 +67,7 @@ class TestCascadeDeleteSeeder extends Seeder
         DB::table('products')->truncate();
         DB::table('users')->truncate();
 
-        // 🔧 Tworzymy użytkownika
+        // Create a test user
         $user = User::create([
             'first_name' => 'Test',
             'last_name' => 'Użytkownik',
@@ -77,7 +77,7 @@ class TestCascadeDeleteSeeder extends Seeder
             'user_type_id' => 1,
         ]);
 
-        // 🔧 Tworzymy produkt
+        // Create a product
         $product = Product::create([
             'name' => 'Test Produkt',
             'description' => 'Opis testowy',
@@ -87,7 +87,7 @@ class TestCascadeDeleteSeeder extends Seeder
             'is_vegetarian' => true,
         ]);
 
-        // 🔧 Tworzymy zamówienie
+        // Create an order for the user
         $order = Order::create([
             'user_id' => $user->id,
             'status' => 'completed',
@@ -100,7 +100,7 @@ class TestCascadeDeleteSeeder extends Seeder
             'apartment_number' => '10',
         ]);
 
-        // 🔧 Dodajemy pozycję zamówienia
+        // Add order item
         OrderItem::create([
             'order_id' => $order->id,
             'product_id' => $product->id,
@@ -108,7 +108,7 @@ class TestCascadeDeleteSeeder extends Seeder
             'unit_price' => 100,
         ]);
 
-        // 🔧 Dodajemy opinię
+        // Add a product review
         ProductReview::create([
             'user_id' => $user->id,
             'product_id' => $product->id,
@@ -117,10 +117,10 @@ class TestCascadeDeleteSeeder extends Seeder
             'comment' => 'Świetny catering!',
         ]);
 
-        // ✅ Usuwamy użytkownika i testujemy kaskadowość
+        //  We remove the user and test cascading
         $user->delete();
 
-        // ✅ Sprawdzamy czy wszystko usunięto
+        //  We check if everything has been deleted
         $this->command->info('Czy zamówienie istnieje? ' . (Order::where('id', $order->id)->exists() ? 'TAK' : 'NIE'));
         $this->command->info('Czy pozycje zamówienia istnieją? ' . (OrderItem::where('order_id', $order->id)->exists() ? 'TAK' : 'NIE'));
         $this->command->info('Czy recenzje istnieją? ' . (ProductReview::where('user_id', $user->id)->exists() ? 'TAK' : 'NIE'));

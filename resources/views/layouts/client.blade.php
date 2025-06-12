@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col pt-[70px]">
 
-    <!-- 🔝 STICKY NAVBAR -->
+    <!-- STICKY NAVBAR -->
     <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center w-full">
             @php
@@ -30,7 +30,7 @@
                 <a href="{{ route('client.products.index') }}" class="hover:text-green-600">Oferty</a>
                 <a href="{{ route('client.contact') }}" class="hover:text-green-600">Kontakt</a>
                 <a href="{{ route('client.orders.index') }}" class="hover:text-green-600">Moje zamówienia</a>
-                <a href="{{ route('client.profile') }}" class="hover:text-green-600">Moje konto</a>
+                <a href="{{ route('profile.show') }}" class="hover:text-green-600">Moje konto</a>
                 <a href="{{ route('client.cart.index') }}" class="hover:text-green-600">Koszyk</a>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
@@ -40,12 +40,12 @@
         </div>
     </header>
 
-    <!-- 🔽 MAIN CONTENT -->
+    <!-- MAIN CONTENT -->
     <main class="flex-grow">
         @yield('content')
     </main>
 
-    <!-- 🔚 FOOTER -->
+    <!-- FOOTER -->
     <footer class="bg-white border-t mt-10 text-center py-4 text-sm text-gray-500">
         &copy; {{ date('Y') }} CateringApp. Wszelkie prawa zastrzeżone.
     </footer>

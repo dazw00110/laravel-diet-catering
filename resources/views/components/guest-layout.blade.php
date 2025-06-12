@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col pt-[70px]">
 
-    <!-- 🔝 STICKY NAVBAR -->
+    <!-- STICKY NAVBAR -->
     <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center w-full">
             @php
@@ -34,12 +34,12 @@
         </div>
     </header>
 
-    <!-- 🔽 MAIN CONTENT -->
+    <!-- MAIN CONTENT -->
     <main class="flex-grow">
         {{ $slot }}
     </main>
 
-    <!-- 🔚 FOOTER -->
+    <!-- FOOTER -->
     <footer class="bg-white border-t mt-10 text-center py-4 text-sm text-gray-500">
         &copy; {{ date('Y') }} CateringApp. Wszelkie prawa zastrzeżone.
     </footer>

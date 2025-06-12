@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -53,5 +54,12 @@ class Product extends Model
         return $this->hasActivePromotion() ? $this->promotion_price : $this->price;
     }
 
+    public function getImageUrlAttribute()
+    {
+        if ($this->image_path && Storage::disk('public')->exists($this->image_path)) {
+            return asset('storage/' . ltrim($this->image_path, '/'));
+        }
 
+        return 'https://images.unsplash.com/vector-1738926381356-a78ac6592999?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    }
 }
