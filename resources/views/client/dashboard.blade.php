@@ -19,14 +19,27 @@
     <!-- ✨ KARUZELA -->
     <section class="py-16 bg-gray-50"
         x-data="{
+            start: 0,
+            max: {{ count($products) }},
+            visible: 4,
+            loop: null,
             showToast: false,
             message: '',
+            next() {
+                this.start = (this.start + 1) % this.max;
+                if (this.start > this.max - this.visible) this.start = 0;
+            },
+            prev() {
+                this.start = (this.start - 1 + this.max) % this.max;
+                if (this.start > this.max - this.visible) this.start = this.max - this.visible;
+            },
             init() {
                 @if(session('success'))
                     this.message = @json(session('success'));
                     this.showToast = true;
                     setTimeout(() => this.showToast = false, 2500);
                 @endif
+                this.loop = setInterval(() => this.next(), 5000);
             }
         }"
         x-init="init()">

@@ -14,7 +14,7 @@
     </div>
 @endif
 
-<form action="{{ route('staff.products.update', $product) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('staff.products.update', $product) }}" method="POST" enctype="multipart/form-data" x-data="{ preview: '{{ $product->image_url }}' }">
     @csrf
     @method('PUT')
 
@@ -59,18 +59,17 @@
                 name="image"
                 accept="image/*"
                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                @change="if($event.target.files[0]){ preview = URL.createObjectURL($event.target.files[0]) }"
             >
 
-            @if ($product->image_path)
-                <div class="mt-2">
-                    <p class="text-gray-600 text-sm mb-1">Aktualne zdjęcie:</p>
-                    <img
-                        src="{{ asset('storage/' . $product->image_path) }}"
-                        alt="Zdjęcie produktu"
-                        class="w-32 h-32 object-cover rounded"
-                    >
-                </div>
-            @endif
+            <div class="mt-2">
+                <p class="text-gray-600 text-sm mb-1">Aktualne zdjęcie:</p>
+                <img
+                    :src="preview"
+                    alt="Zdjęcie produktu"
+                    class="w-32 h-32 object-cover rounded"
+                >
+            </div>
         </div>
 
         <div>

@@ -57,10 +57,12 @@ class Product extends Model
 
     public function getImageUrlAttribute()
     {
-        if ($this->image_path && \Storage::disk('public')->exists($this->image_path)) {
-            return asset('storage/' . $this->image_path);
+        $filename = $this->image_path ? basename($this->image_path) : null;
+        $path = $filename ? 'products/' . $filename : 'products/default-product.png';
+
+        if (!file_exists(storage_path('app/public/' . $path))) {
+            $path = 'products/default-product.png';
         }
-        // Użyj własnego domyślnego pliku (np. public/storage/products/default.png)
-        return asset('storage/products/default.png');
+        return asset('storage/' . $path);
     }
 }
