@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -26,7 +27,6 @@ class ProductController extends Controller
             $query->where('price', '<=', (int)$request->input('price_max'));
         }
 
-        // Filtrowanie po diecie
         if ($request->input('diet') === 'vegan') {
             $query->where('is_vegan', true);
         } elseif ($request->input('diet') === 'vegetarian') {
@@ -58,6 +58,15 @@ class ProductController extends Controller
 
         $products = $query->paginate($perPage)->withQueryString();
 
-        return view('client.products.index', compact('products'));
+        $catering = Auth::user()->orders()
+            ->where('status', 'in_progress') 
+            ->whereDate('end_date', '>', now())
+            ->orderBy('end_date')
+            ->first();
+
+
+        $showReminder = $catering && $catering->end_date->diffInDays(now()) < 3 && !session()->get('hide_reminder', false);
+
+        return view('client.products.index', compact('products', 'catering', 'showReminder'));
     }
 }
