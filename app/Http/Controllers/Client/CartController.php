@@ -51,7 +51,7 @@ class CartController extends Controller
             return redirect()->back()->with('error', 'Nie można dodać więcej niż 10 sztuk danego produktu.');
         }
 
-        $item->unit_price = $product->price;
+        $item->unit_price = $product->getCurrentPrice();
         $item->save();
 
         $cart->total_price = $cart->items->sum(fn($i) => $i->quantity * $i->unit_price);
@@ -173,7 +173,7 @@ class CartController extends Controller
 
         $itemsByProduct = [];
         foreach ($cart->items as $item) {
-            $item->unit_price = $item->product->price;
+            $item->unit_price = $item->product->getCurrentPrice();
             $item->save();
 
             $total += $item->quantity * $item->unit_price * $days;
