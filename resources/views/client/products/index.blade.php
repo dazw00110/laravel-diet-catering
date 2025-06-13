@@ -3,6 +3,23 @@
 @section('title', 'Oferty cateringowe')
 
 @section('content')
+
+@if ($showReminder && $catering)
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded-lg shadow flex justify-between items-center w-3/4 mx-auto">
+        <div>
+            <p class="font-semibold">Twoje zamówienie niedługo dobiegnie końca!</p>
+            <p class="text-sm">Zamów je ponownie, aby nie przerywać cateringu.</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{{ route('client.orders.index') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">Sprawdź które oraz zamów ponownie!</a>
+            <form method="POST" action="{{ route('client.reminder.dismiss') }}">
+                @csrf
+                <button type="submit" class="bg-gray-300 hover:bg-gray-400 text-black px-3 py-1 rounded">Odrzuć</button>
+            </form>
+        </div>
+    </div>
+@endif
+
 <div class="max-w-7xl mx-auto px-4 py-8"
      x-data="{ showToast: false, message: '', init() {
         @if(session('success'))
