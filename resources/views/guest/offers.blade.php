@@ -108,7 +108,7 @@
                     @php $review = $product->reviews->first(); @endphp
                     @if ($review)
                         <div class="text-xs text-gray-500 italic mb-2">
-                            "{{ Str::limit($review->comment, 60) }}" – {{ $review->user->first_name ?? 'Anonim' }} {{ $review->user->last_name ?? '' }}
+                            "{{ Str::limit($review->comment, 60) }}" – Anonim
                         </div>
                     @endif
                     <div class="flex flex-col gap-2 mt-auto">
@@ -154,7 +154,7 @@
                             @forelse ($p->reviews as $review)
                                 <div class="border-b border-gray-200 pb-3 mb-3 last:border-none last:mb-0">
                                     <p class="font-semibold text-sm">
-                                        {{ $review->user->first_name ?? 'Anonim' }} {{ $review->user->last_name ?? '' }}
+                                        Anonim
                                     </p>
                                     <div class="flex items-center h-6 mb-1">
                                         @for ($i = 0; $i < 5; $i++)
