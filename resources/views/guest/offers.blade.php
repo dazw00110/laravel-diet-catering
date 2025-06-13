@@ -72,7 +72,14 @@
                     <h2 class="font-bold text-lg mb-1">{{ $product->name }}</h2>
                     <p class="text-sm text-gray-600 mb-2">{{ Str::limit($product->description, 100) }}</p>
                     <div class="flex items-center gap-2 mb-2">
-                        <span class="text-lg font-bold text-green-700">{{ number_format($product->price, 2) }} zł</span>
+                        @if($product->hasActivePromotion())
+    <div class="flex items-center gap-2">
+        <span class="text-gray-400 line-through">{{ number_format($product->price, 2) }} zł</span>
+        <span class="text-lg font-bold text-green-700">{{ number_format($product->promotion_price, 2) }} zł</span>
+    </div>
+@else
+    <span class="text-lg font-bold text-green-700">{{ number_format($product->price, 2) }} zł</span>
+@endif
                         <span class="text-xs text-gray-500">/ dzień</span>
                     </div>
                     <div class="flex gap-2 mt-1 text-xs text-gray-700 mb-2">

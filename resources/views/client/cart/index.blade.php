@@ -185,9 +185,13 @@
                                      x-data="{ qty: {{ $item->quantity }} }">
                                     <!-- Product Image -->
                                     <div class="flex-shrink-0">
-                                        <img src="{{ $item->product->image_url }}"
-                                             alt="{{ $item->product->name }}"
-                                             class="w-24 h-24 object-cover rounded-lg">
+                                        <img
+    src="{{ $item->product->image_url }}"
+    onerror="this.onerror=null;this.src='https://images.unsplash.com/vector-1738926381356-a78ac6592999?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';"
+    alt="{{ $item->product->name }}"
+    class="w-24 h-24 object-contain rounded-lg"
+/>
+
                                     </div>
 
                                     <!-- Product Info -->

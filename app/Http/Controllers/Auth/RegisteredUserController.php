@@ -13,17 +13,11 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle an incoming registration request (pełna walidacja bez wege).
-     */
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -59,7 +53,6 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        // After registration, the user must configure TOTP
-        return redirect()->route('2fa.setup');
+        return redirect()->route('profile');
     }
 }
