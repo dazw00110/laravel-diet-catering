@@ -1,26 +1,26 @@
 @echo off
-title Laravel Diet Catering - Setup
+title Laravel Diet Catering - Setup (bez Dockera)
 
 echo ===============================================
-echo Laravel Setup Script
+echo Laravel Setup Script (No Docker Required)
 echo ===============================================
 
-REM Tworzenie pliku .env jeśli nie istnieje
+REM Tworzenie pliku .env, jeśli nie istnieje
 IF NOT EXIST .env (
     echo Tworzenie pliku .env z .env.example...
     copy .env.example .env
 )
 
-REM Tworzenie wymaganych folderów
-echo Tworzenie folderow tymczasowych...
+REM Tworzenie folderów tymczasowych
+echo Tworzenie folderów cache, logs...
 mkdir bootstrap\cache >nul 2>nul
 mkdir storage\framework\cache >nul 2>nul
 mkdir storage\framework\sessions >nul 2>nul
 mkdir storage\framework\views >nul 2>nul
 mkdir storage\logs >nul 2>nul
 
-REM Instalacja zależności PHP
-echo Instalowanie zaleznosci PHP...
+REM Instalowanie zależności PHP
+echo Instalowanie zależności Composer...
 IF EXIST composer.phar (
     call php composer.phar install
 ) ELSE (
@@ -28,37 +28,40 @@ IF EXIST composer.phar (
 )
 
 IF NOT EXIST vendor\autoload.php (
-    echo Blad: composer install nie powiodl sie.
+    echo ❌ Blad: composer install nie powiodl sie.
     pause
     exit /b
 )
 
-REM Linkowanie storage (ważne!)
-echo Tworzenie linku storage...
-call php artisan storage:link
-
-REM Generowanie klucza
+REM Generowanie klucza aplikacji
 echo Generowanie klucza aplikacji...
 call php artisan key:generate
 
-REM Migracje + seedy
+REM Tworzenie symbolic link do storage/public
+echo Tworzenie linku storage/public...
+call php artisan storage:link
+
+REM Wykonywanie migracji i seed'ów
 echo Migracje i seedy...
 call php artisan migrate:fresh --seed
 
-REM Instalacja npm
+REM Instalacja zależności npm
 IF EXIST package.json (
-    echo Instalacja paczek NPM...
+    echo Instalowanie paczek NPM...
     call npm install
 ) ELSE (
     echo Brak package.json — pomijam npm install.
 )
 
-REM Uruchomienie serwerów
-echo Uruchamianie Vite i backendu Laravel...
+REM Uruchomienie Vite (npm run dev)
+echo Uruchamianie Vite (npm run dev)...
 start cmd /k "npm run dev"
+
+REM Uruchomienie serwera Laravel
+echo Uruchamianie serwera Laravel (php artisan serve)...
 start cmd /k "php artisan serve"
 
 echo ===============================================
-echo Wszystko gotowe! Odwiedz: http://127.0.0.1:8000
+echo ✅ Wszystko gotowe! Odwiedz: http://127.0.0.1:8000
 echo ===============================================
 pause
