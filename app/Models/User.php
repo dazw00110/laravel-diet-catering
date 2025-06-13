@@ -52,4 +52,22 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Discount::class, 'discount_user');
     }
+
+        public function discountCodes()
+    {
+        return $this->hasMany(DiscountCode::class);
+    }
+
+    public function hasPermanentDiscount(int $value, ?string $tag = null): bool
+    {
+        $query = $this->discountCodes()
+            ->where('value', $value)
+            ->where('permanent', true);
+
+        if ($tag) {
+            $query->where('description', $tag);
+        }
+
+        return $query->exists();
+    }
 }

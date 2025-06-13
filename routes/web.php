@@ -119,9 +119,15 @@ Route::prefix('client')->middleware(['auth', EnsureTotpVerified::class, RoleMidd
     Route::post('/orders/{order}/cancel', [ClientOrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('/orders/{order}/reviews/create', [ProductReviewController::class, 'create'])->name('orders.reviews.create');
     Route::post('/orders/{order}/reviews', [ProductReviewController::class, 'store'])->name('orders.reviews.store');
-
+    Route::post('/orders/{order}/repeat', [ClientOrderController::class, 'repeat'])->name('orders.repeat');
+    
     Route::get('/contact', fn () => view('client.contact'))->name('contact');
     Route::get('/profile', fn () => redirect()->route('profile.show'))->name('profile');
+
+    Route::post('/reminder/dismiss', function () {
+    session()->put('hideReminder', true);
+    return redirect()->back();
+    })->name('reminder.dismiss');
 });
 
 // === Public Offers

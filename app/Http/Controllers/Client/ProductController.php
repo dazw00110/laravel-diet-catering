@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -59,13 +60,12 @@ class ProductController extends Controller
         $products = $query->paginate($perPage)->withQueryString();
 
         $catering = Auth::user()->orders()
-            ->where('status', 'in_progress') 
+            ->where('status', 'in_progress')
             ->whereDate('end_date', '>', now())
             ->orderBy('end_date')
             ->first();
 
-
-        $showReminder = $catering && $catering->end_date->diffInDays(now()) < 3 && !session()->get('hide_reminder', false);
+        $showReminder = $catering && $catering->end_date->diffInDays(now()) < 3 && !session()->get('hideReminder', false);
 
         return view('client.products.index', compact('products', 'catering', 'showReminder'));
     }

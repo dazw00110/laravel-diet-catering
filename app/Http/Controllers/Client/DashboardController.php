@@ -22,12 +22,7 @@ class DashboardController extends Controller
             ->orderBy('end_date')
             ->first();
 
-
-        $showReminder = false;
-
-        if ($catering && $catering->end_date->diffInDays(now()) < 3) {
-            $showReminder = !session()->get('hide_reminder', false);
-        }
+        $showReminder = $catering && $catering->end_date->diffInDays(now()) < 3 && !session()->get('hideReminder', false);
 
         return view('client.dashboard', compact('products', 'catering', 'showReminder'));
     }

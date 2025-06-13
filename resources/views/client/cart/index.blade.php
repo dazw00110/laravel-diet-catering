@@ -343,7 +343,40 @@
                                         @endforeach
                                     </div>
                                 @endif
+
+                                @if ($loyaltyCodes->isNotEmpty())
+                                    <p class="text-sm font-semibold text-gray-700 mt-6 mb-3">🏆 Kody lojalnościowe:</p>
+                                    <div class="space-y-2">
+                                        @foreach ($loyaltyCodes as $code)
+                                            <div
+                                                class="p-3 bg-purple-50 border border-purple-200 rounded-lg cursor-pointer hover:bg-purple-100 transition"
+                                                @click="
+                                                    discountCode = '{{ strtolower($code->code) }}';
+                                                    discountValue = {{ $code->value }};
+                                                    discountType = '{{ $code->is_percentage ? 'percentage' : 'fixed' }}';
+                                                    calculateTotal();
+                                                    showMessage('Kod {{ $code->code }} został wstawiony.', 'success');
+                                                "
+                                            >
+                                                <div class="font-bold text-purple-800 text-sm">
+                                                    {{ $code->code }}
+                                                    @if ($code->permanent)
+                                                        <span class="inline-block ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded-full align-middle">stały</span>
+                                                    @endif
+                                                </div>
+
+                                                <div class="text-xs text-purple-600">
+                                                    {{ $code->is_percentage ? "-{$code->value}%" : "-".number_format($code->value, 2)." zł" }}<br>
+                                                    {{ $code->permanent
+                                                        ? 'Stały rabat'
+                                                        : 'Ważny do: ' . \Illuminate\Support\Carbon::parse($code->expires_at)->format('d.m.Y') }}
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
+
 
                             <!-- Price Breakdown -->
                             <div class="border-t pt-4">
@@ -479,9 +512,10 @@
                     <li><strong>Rabat za niezadowolenie:</strong> Jeśli anulujesz zamówienie i wystawisz niską ocenę (średnia &lt; 2), możesz otrzymać dodatkowy kod rabatowy.</li>
                 </ul>
                 <div class="mt-4 text-sm text-blue-800 border-t pt-3">
-                    <strong>Rabat lojalnościowy:</strong>
-                    Po wydaniu 10 000 zł otrzymasz stałą zniżkę -5%, a po przekroczeniu 15 000 zł -10% na każde zamówienie.<br>
-                    <span class="italic text-blue-700">Funkcjonalność nie jest jeszcze dostępna – wprowadzimy ją w przyszłości.</span>
+                    <strong>Rabat lojalnościowy:</strong><br>
+                        - Po wydaniu 10 000 zł otrzymasz stałą zniżkę -5%<br>
+                        - Po przekroczeniu 15 000 zł – stała zniżka zwiększa się do -10%<br>
+                        - Dodatkowe rabaty za liczbę zamówień i weryfikację konta
                 </div>
 
                 <!-- How discounts are calculated -->
@@ -499,7 +533,7 @@
                         </li>
                     </ol>
                     <div class="mt-4 text-sm text-blue-800 border-t pt-3">
-                        <strong>Przykład:</strong> Jeśli masz kod rabatowy -19%, to rabat ten zostanie naliczony od kwoty po wszystkich innych promocjach (czyli po 4+1 gratis, rabacie 10%/15% i ewentualnym rabacie lojalnościowym).
+                        <strong><u>Rabaty nie sumują się<u></strong>
                     </div>
                 </div>
             </div>

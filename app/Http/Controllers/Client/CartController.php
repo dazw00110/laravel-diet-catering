@@ -27,7 +27,17 @@ class CartController extends Controller
 
         $days = max($cart->start_date->diffInDays($cart->end_date) + 1, 7);
 
-        return view('client.cart.index', compact('cart', 'userDiscounts', 'days'));
+    $loyaltyCodes = auth()->user()->discountCodes()
+        ->where(function ($q) {
+            $q->where('permanent', true)
+            ->orWhere(function ($q) {
+                $q->where('expires_at', '>=', now())->where('used', false);
+            });
+        })
+        ->get();
+
+    return view('client.cart.index', compact('cart', 'userDiscounts', 'loyaltyCodes', 'days'));
+
     }
 
 
@@ -207,24 +217,46 @@ class CartController extends Controller
 
         $discountCode = $request->input('discount_code');
         if ($discountCode) {
-            $discount = Discount::whereRaw('LOWER(code) = ?', [strtolower($discountCode)])
-                ->whereHas('users', fn($q) => $q->where('user_id', Auth::id()))
+            $code = \App\Models\DiscountCode::whereRaw('LOWER(code) = ?', [strtolower($discountCode)])
+                ->where('user_id', Auth::id())
+                ->where(function ($q) {
+                    $q->where('permanent', true)
+                    ->orWhere(function ($q) {
+                        $q->where('expires_at', '>=', now())->where('used', false);
+                    });
+                })
                 ->first();
 
-            if ($discount) {
-                // Code discount calculated from the amount after all other discounts
-                if ($discount->type === 'percentage') {
-                    $discountSavings = $totalAfterLoyalty * ($discount->value / 100);
-                } elseif ($discount->type === 'fixed') {
-                    $discountSavings = min($discount->value, $totalAfterLoyalty);
+            if ($code) {
+                $discountSavings = $code->is_percentage
+                    ? $totalAfterLoyalty * ($code->value / 100)
+                    : min($code->value, $totalAfterLoyalty);
+
+                if (!$code->permanent) {
+                    $code->update(['used' => true]);
                 }
 
-                $discount->users()->detach(Auth::id());
-                $discount->delete();
+                $cart->discount_code = $code->code;
+            } else {
+                $discount = Discount::whereRaw('LOWER(code) = ?', [strtolower($discountCode)])
+                    ->whereHas('users', fn($q) => $q->where('user_id', Auth::id()))
+                    ->first();
 
-                $cart->discount_code = $discountCode;
+                if ($discount) {
+                    if ($discount->type === 'percentage') {
+                        $discountSavings = $totalAfterLoyalty * ($discount->value / 100);
+                    } elseif ($discount->type === 'fixed') {
+                        $discountSavings = min($discount->value, $totalAfterLoyalty);
+                    }
+
+                    $discount->users()->detach(Auth::id());
+                    $discount->delete();
+
+                    $cart->discount_code = $discountCode;
+                }
             }
         }
+
 
         $cart->city = $request->input('city');
         $cart->postal_code = $request->input('postal_code');
